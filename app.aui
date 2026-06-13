@@ -1,0 +1,18 @@
+import "components/cards.aui"
+
+page Home:
+  title "AUIG Dashboard"
+
+  view:
+    section:
+      h1 "Dashboard" bold
+      p "Simple reusable UI generated from AUIG" muted
+
+      row gap-large:
+        use MetricCard title "Total Users" value "1,240"
+        use MetricCard title "Revenue" value "$18,900"
+        use MetricCard title "Active Projects" value "32"
+
+      row gap-medium:
+        btn "Dashboard" primary to "/dashboard"
+        btn "About" secondary to "/about"

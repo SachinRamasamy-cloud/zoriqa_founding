@@ -1,0 +1,18 @@
+import "components/cards.aui"
+
+page PageOne:
+  title "Page One"
+
+  view:
+    section:
+      h1 "Page One" bold
+      p "This is another generated route" muted
+
+      row gap-large:
+        use MetricCard title "Total Users" value "1,240"
+        use MetricCard title "Revenue" value "$18,900"
+        use MetricCard title "Active Projects" value "32"
+
+      row gap-medium:
+        btn "Home" secondary to "/"
+        btn "Dashboard" primary to "/dashboard"

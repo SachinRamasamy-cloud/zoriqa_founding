@@ -1,0 +1,11 @@
+page About:
+  title "About"
+
+  view:
+    center:
+      h1 "About AUIG" bold
+      p "AUIG is a simple website language." muted
+
+      row gap-medium:
+        btn "Back Home" secondary to "/"
+        btn "Dashboard" primary to "/dashboard"

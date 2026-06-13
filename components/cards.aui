@@ -1,0 +1,4 @@
+component MetricCard title value:
+  card:
+    p "{title}" muted
+    h2 "{value}" bold

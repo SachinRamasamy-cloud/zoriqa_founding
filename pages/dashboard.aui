@@ -1,0 +1,17 @@
+import "components/cards.aui"
+
+page Dashboard:
+  title "Dashboard"
+
+  view:
+    section:
+      h1 "Dashboard" bold
+      p "This is the dashboard route" muted
+
+      row gap-large:
+        use MetricCard title "Active Projects" value "32"
+        use MetricCard title "Completed Jobs" value "128"
+
+      row gap-medium:
+        btn "Home" secondary to "/"
+        btn "About" primary to "/about"

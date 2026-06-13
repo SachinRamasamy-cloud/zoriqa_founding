@@ -1,0 +1,7 @@
+[package]
+name = "auig"
+version = "0.1.0"
+edition = "2021"
+description = "AUIG v0.1 - a simple .aui to static website compiler"
+
+[dependencies]

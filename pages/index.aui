@@ -1,0 +1,18 @@
+import "components/cards.aui"
+
+page Home:
+  title "Home"
+
+  view:
+    section:
+      h1 "Welcome to AUIG" bold
+      p "This is the home page" muted
+
+      row gap-large:
+        use MetricCard title "Users" value "1,240"
+        use MetricCard title "Revenue" value "$18,900"
+
+      row gap-medium:
+        btn "Dashboard" primary to "/dashboard"
+        btn "About" secondary to "/about"
+        link "Open Page One" to "/page1"
