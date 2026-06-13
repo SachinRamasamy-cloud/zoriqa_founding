@@ -1,18 +1,50 @@
-import "components/cards.aui"
+import "auig/ui"
 
-page PageOne:
-  title "Page One"
+page Showcase:
+  title "AUIG - Showcase"
 
   view:
-    section:
-      h1 "Page One" bold
-      p "This is another generated route" muted
+    navbar "AUIG" dark sticky:
+      link "Docs" to "/docs"
+      link "About" to "/about"
+      link "Dashboard" to "/dashboard"
+      link "Showcase" to "/page1"
+      action "Get Started" to "/docs"
+
+    hero "Web Layout Showcase" primary:
+      subtitle "Explore standard static website layouts and designs crafted entirely in AUIG."
+      action "Browse Templates" to "#templates"
+      badge "Showcase Gallery" warning
+
+    section py-12:
+      h2 "Predesigned Templates" bold text-gray-900 mb-4
+      p "Deployable responsive wireframes ready to build your next web project." muted mb-8
 
       row gap-large:
-        use MetricCard title "Total Users" value "1,240"
-        use MetricCard title "Revenue" value "$18,900"
-        use MetricCard title "Active Projects" value "32"
+        feature-card "SaaS Landing Page" success:
+          icon zap
+          desc "Features hero section, dynamic pricing, and checkmark item support."
+          badge "Recommended" success
+        feature-card "Blog Layout" primary:
+          icon code
+          desc "Minimalist spacing containing articles, author profiles, and read times."
+          badge "New" primary
+        feature-card "Developer Portfolio" warning:
+          icon palette
+          desc "Dark-mode layout optimized to show off GitHub projects and tech stacks."
+          badge "High converting" warning
 
-      row gap-medium:
-        btn "Home" secondary to "/"
-        btn "Dashboard" primary to "/dashboard"
+    footer "© 2026 AUIG Project. Open source software." dark:
+      row gap-large justify-between w-full:
+        column gap-small:
+          h2 "AUIG" bold text-white
+          p "The Python-like web layout compiler." small muted
+        column gap-small:
+          h2 "Pages" bold text-white
+          link "Home" to "/"
+          link "Docs" to "/docs"
+          link "About" to "/about"
+        column gap-small:
+          h2 "System" bold text-white
+          link "Dashboard" to "/dashboard"
+          link "Showcase" to "/page1"

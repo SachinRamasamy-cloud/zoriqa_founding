@@ -1,11 +1,47 @@
+import "auig/ui"
+
 page About:
-  title "About"
+  title "About AUIG"
 
   view:
-    center:
-      h1 "About AUIG" bold
-      p "AUIG is a simple website language." muted
+    navbar "AUIG" dark sticky:
+      link "Docs" to "/docs"
+      link "About" to "/about"
+      link "Dashboard" to "/dashboard"
+      link "Showcase" to "/page1"
+      action "Get Started" to "/docs"
 
-      row gap-medium:
-        btn "Back Home" secondary to "/"
-        btn "Dashboard" primary to "/dashboard"
+    hero "About the Compiler" primary:
+      subtitle "Learn about the mission, architecture, and technology behind the AUIG layout system."
+      action "Read Docs" to "/docs"
+      badge "Rust Powered" success
+
+    section py-12:
+      h2 "The Mission" bold text-gray-900 mb-4
+      p "AUIG was created to bridge the gap between simple pythonic indentation syntax and high-performance, modern static websites. By compiling layouts at build-time, we deliver lightning-fast page loading speeds with zero client-side framework overhead." muted mb-8
+
+      row gap-large:
+        feature-card "Build Speed" success:
+          icon zap
+          desc "The Rust compiler translates files in less than a millisecond, facilitating quick live-reload dev flows."
+        feature-card "Tailored Layouts" primary:
+          icon grid
+          desc "Grid-based rows and flex column configurations allow you to assemble responsive content blocks effortlessly."
+        feature-card "Pruned Styling" warning:
+          icon cpu
+          desc "Unreferenced tailwind-style coloring classes are excluded from the output stylesheet, keeping file transfers tiny."
+
+    footer "© 2026 AUIG Project. Open source software." dark:
+      row gap-large justify-between w-full:
+        column gap-small:
+          h2 "AUIG" bold text-white
+          p "The Python-like web layout compiler." small muted
+        column gap-small:
+          h2 "Pages" bold text-white
+          link "Home" to "/"
+          link "Docs" to "/docs"
+          link "About" to "/about"
+        column gap-small:
+          h2 "System" bold text-white
+          link "Dashboard" to "/dashboard"
+          link "Showcase" to "/page1"

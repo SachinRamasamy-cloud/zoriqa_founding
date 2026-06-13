@@ -1,18 +1,62 @@
-import "components/cards.aui"
+import "auig/ui"
 
 page Home:
-  title "Home"
+  title "AUIG - Modern Indented Web Language"
 
   view:
-    section:
-      h1 "Welcome to AUIG" bold
-      p "This is the home page" muted
+    navbar "AUIG" dark sticky:
+      link "Docs" to "/docs"
+      link "About" to "/about"
+      link "Dashboard" to "/dashboard"
+      link "Showcase" to "/page1"
+      action "Get Started" to "/docs"
+
+    alert "Release Alert" success:
+      message "AUIG v0.2 is officially live. Built in Rust, powered by a JIT utility CSS compiler."
+
+    hero "Write Less Code. Build Faster Websites." primary:
+      subtitle "The indentation-based language for modern developers. Compile pythonic blocks directly to semantic HTML and JIT CSS."
+      action "Start Documentation" to "/docs"
+      badge "v0.2.0" warning
+
+    section py-12:
+      row gap-large justify-between items-center:
+        stat-card "Compile Time" "0.4ms" success:
+          badge "Fast" success
+        stat-card "CSS Size" "5.9 KB" primary:
+          badge "Optimized" primary
+        stat-card "Dependencies" "Zero" warning:
+          badge "Self-contained" warning
+
+    section py-12:
+      h2 "High Performance, Low Boilerplate" bold text-gray-900 mb-4
+      p "Simplify your frontend workflow. Write clean structure without tag matching errors, and style instantly with built-in design kits." muted mb-8
 
       row gap-large:
-        use MetricCard title "Users" value "1,240"
-        use MetricCard title "Revenue" value "$18,900"
+        feature-card "Indentation Syntax" primary:
+          icon code
+          desc "Python-like spacing replaces nested HTML closing tags, making layouts clean and readable."
+          badge "Clean" primary
+        feature-card "Just-in-Time CSS" success:
+          icon zap
+          desc "Only the utilities you actually reference in your files are generated in the final stylesheet."
+          badge "JIT" success
+        feature-card "Design Kit Presets" warning:
+          icon palette
+          desc "Get predesigned alerts, badges, navbars, cards, and pricing grids out of the box."
+          badge "Bundled" warning
 
-      row gap-medium:
-        btn "Dashboard" primary to "/dashboard"
-        btn "About" secondary to "/about"
-        link "Open Page One" to "/page1"
+    footer "© 2026 AUIG Project. Open source software." dark:
+      row gap-large justify-between w-full:
+        column gap-small:
+          h2 "AUIG" bold text-white
+          p "The Python-like web layout compiler." small muted
+        column gap-small:
+          h2 "Pages" bold text-white
+          link "Home" to "/"
+          link "Docs" to "/docs"
+          link "About" to "/about"
+        column gap-small:
+          h2 "System" bold text-white
+          link "Dashboard" to "/dashboard"
+          link "Showcase" to "/page1"

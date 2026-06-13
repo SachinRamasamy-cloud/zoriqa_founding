@@ -4,6 +4,9 @@ mod lexer;
 mod parser;
 mod preprocessor;
 mod token;
+mod design_kit;
+mod layout;
+mod tests;
 
 use std::env;
 use std::fs;
@@ -11,11 +14,6 @@ use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::path::{Component, Path, PathBuf};
 use std::time::SystemTime;
-
-use generator::{generate_css, generate_html};
-use lexer::lex;
-use parser::Parser;
-use preprocessor::load_and_expand;
 
 fn main() {
     if let Err(error) = run() {
@@ -46,17 +44,44 @@ fn run() -> Result<(), String> {
 }
 
 fn build_project(input_file: &str, out_dir: &str) -> Result<(), String> {
-    let source = load_and_expand(input_file)?;
+    let mut user_components = std::collections::HashMap::new();
+    let mut active_kits = Vec::new();
 
-    let tokens = lex(&source)?;
-    let mut parser = Parser::new(tokens);
-    let program = parser.parse_program()?;
+    // 1. Recursive AST compilation
+    let mut program = preprocessor::compile_file(input_file, &mut user_components, &mut active_kits)?;
 
-    let html = generate_html(&program);
-    let css = generate_css();
+    // 2. Apply layouts
+    layout::apply_layouts(&mut program, input_file)?;
+
+    // Find active theme decl
+    let theme_decl = program.declarations.iter().find_map(|decl| match decl {
+        crate::ast::TopLevel::Theme(t) => Some(t.clone()),
+        _ => None,
+    });
+
+    // 3. Design kit transformations
+    for decl in &mut program.declarations {
+        match decl {
+            crate::ast::TopLevel::Page(page) => {
+                page.children = design_kit::transform_nodes(page.children.clone(), &user_components, &active_kits, input_file)?;
+            }
+            crate::ast::TopLevel::Layout(layout) => {
+                layout.children = design_kit::transform_nodes(layout.children.clone(), &user_components, &active_kits, input_file)?;
+            }
+            _ => {}
+        }
+    }
+
+    // 4. Collect and validate JIT CSS
+    let mut used_flags = std::collections::HashSet::new();
+    generator::collect_program_flags(&program, &mut used_flags);
+    generator::validate_and_collect_jit_css(&used_flags, input_file)?;
+
+    // 5. Generate HTML and CSS
+    let html = generator::generate_html(&program, &theme_decl);
+    let css = generator::generate_css(&used_flags, &theme_decl);
 
     let out_path = PathBuf::from(out_dir);
-
     fs::create_dir_all(&out_path)
         .map_err(|_| "AUIG Error: could not create output folder".to_string())?;
 
@@ -92,19 +117,57 @@ fn build_pages(pages_dir: &str, out_dir: &str) -> Result<(), String> {
         ));
     }
 
-    for page_file in page_files {
+    let mut used_flags = std::collections::HashSet::new();
+    let mut pages_data = Vec::new();
+    let mut global_theme = None;
+
+    let mut user_components = std::collections::HashMap::new();
+    let mut active_kits = Vec::new();
+
+    // Pre-load all page component mappings
+    let mut compiled_programs = Vec::new();
+    for page_file in &page_files {
         let input_file = page_file
             .to_str()
             .ok_or_else(|| "AUIG Error: invalid page path".to_string())?;
 
-        let source = load_and_expand(input_file)?;
-        let tokens = lex(&source)?;
-        let mut parser = Parser::new(tokens);
-        let program = parser.parse_program()?;
+        let program = preprocessor::compile_file(input_file, &mut user_components, &mut active_kits)?;
+        if global_theme.is_none() {
+            global_theme = program.declarations.iter().find_map(|decl| match decl {
+                crate::ast::TopLevel::Theme(t) => Some(t.clone()),
+                _ => None,
+            });
+        }
+        compiled_programs.push((page_file.clone(), program));
+    }
 
-        let html = generate_html(&program);
+    for (page_file, mut program) in compiled_programs {
+        let input_file = page_file.to_str().unwrap();
+
+        layout::apply_layouts(&mut program, input_file)?;
+
+        for decl in &mut program.declarations {
+            match decl {
+                crate::ast::TopLevel::Page(page) => {
+                    page.children = design_kit::transform_nodes(page.children.clone(), &user_components, &active_kits, input_file)?;
+                }
+                crate::ast::TopLevel::Layout(layout) => {
+                    layout.children = design_kit::transform_nodes(layout.children.clone(), &user_components, &active_kits, input_file)?;
+                }
+                _ => {}
+            }
+        }
+
+        generator::collect_program_flags(&program, &mut used_flags);
+        let html = generator::generate_html(&program, &global_theme);
         let output_file = route_output_path(&page_file, &pages_path, &out_path)?;
+        pages_data.push((output_file, html));
+    }
 
+    // Validate utility classes
+    generator::validate_and_collect_jit_css(&used_flags, "pages build")?;
+
+    for (output_file, html) in pages_data {
         if let Some(parent) = output_file.parent() {
             fs::create_dir_all(parent)
                 .map_err(|_| "AUIG Error: could not create route folder".to_string())?;
@@ -116,7 +179,8 @@ fn build_pages(pages_dir: &str, out_dir: &str) -> Result<(), String> {
         println!("Route generated: {}", output_file.display());
     }
 
-    fs::write(out_path.join("auig.css"), generate_css())
+    let css = generator::generate_css(&used_flags, &global_theme);
+    fs::write(out_path.join("auig.css"), css)
         .map_err(|_| "AUIG Error: could not write auig.css".to_string())?;
 
     Ok(())
@@ -141,15 +205,32 @@ fn check_pages(pages_dir: &str) -> Result<(), String> {
         ));
     }
 
+    let mut user_components = std::collections::HashMap::new();
+    let mut active_kits = Vec::new();
+
     for page_file in page_files {
         let input_file = page_file
             .to_str()
             .ok_or_else(|| "AUIG Error: invalid page path".to_string())?;
 
-        let source = load_and_expand(input_file)?;
-        let tokens = lex(&source)?;
-        let mut parser = Parser::new(tokens);
-        parser.parse_program()?;
+        let mut program = preprocessor::compile_file(input_file, &mut user_components, &mut active_kits)?;
+        layout::apply_layouts(&mut program, input_file)?;
+
+        for decl in &mut program.declarations {
+            match decl {
+                crate::ast::TopLevel::Page(page) => {
+                    page.children = design_kit::transform_nodes(page.children.clone(), &user_components, &active_kits, input_file)?;
+                }
+                crate::ast::TopLevel::Layout(layout) => {
+                    layout.children = design_kit::transform_nodes(layout.children.clone(), &user_components, &active_kits, input_file)?;
+                }
+                _ => {}
+            }
+        }
+
+        let mut used_flags = std::collections::HashSet::new();
+        generator::collect_program_flags(&program, &mut used_flags);
+        generator::validate_and_collect_jit_css(&used_flags, input_file)?;
 
         println!("Page check passed: {}", page_file.display());
     }
@@ -359,7 +440,10 @@ fn handle_request(mut stream: TcpStream, out_dir: &str) -> Result<(), String> {
     let request = String::from_utf8_lossy(&buffer);
     let path = get_request_path(&request);
 
-    let file_path = if path == "/" {
+    // Try routing matching (first check dynamic routes)
+    let file_path = if let Some(matched) = match_dynamic_route(&path, out_dir) {
+        matched
+    } else if path == "/" {
         PathBuf::from(out_dir).join("index.html")
     } else {
         let clean_path = path.trim_start_matches('/');
@@ -400,7 +484,6 @@ fn handle_request(mut stream: TcpStream, out_dir: &str) -> Result<(), String> {
 
 fn get_request_path(request: &str) -> String {
     let first_line = request.lines().next().unwrap_or("");
-
     let parts: Vec<&str> = first_line.split_whitespace().collect();
 
     if parts.len() >= 2 {
@@ -448,7 +531,6 @@ fn get_content_type(path: &Path) -> &'static str {
 
 fn is_safe_path(file_path: &Path, out_dir: &str) -> bool {
     let out_dir_path = Path::new(out_dir);
-
     let Ok(relative) = file_path.strip_prefix(out_dir_path) else {
         return false;
     };
@@ -512,9 +594,12 @@ fn tokens_command(args: &[String]) -> Result<(), String> {
         return Err("AUIG Error: missing input file".to_string());
     }
 
-    let source = load_and_expand(&args[2])?;
 
-    let tokens = lex(&source)?;
+
+    let source = fs::read_to_string(&args[2])
+        .map_err(|_| format!("AUIG Error: could not read file '{}'", args[2]))?;
+
+    let tokens = lexer::lex(&source)?;
 
     for token in tokens {
         println!("{:?}", token);
@@ -528,11 +613,10 @@ fn ast_command(args: &[String]) -> Result<(), String> {
         return Err("AUIG Error: missing input file".to_string());
     }
 
-    let source = load_and_expand(&args[2])?;
+    let mut user_components = std::collections::HashMap::new();
+    let mut active_kits = Vec::new();
 
-    let tokens = lex(&source)?;
-    let mut parser = Parser::new(tokens);
-    let program = parser.parse_program()?;
+    let program = preprocessor::compile_file(&args[2], &mut user_components, &mut active_kits)?;
 
     println!("{:#?}", program);
 
@@ -550,11 +634,27 @@ fn check_command(args: &[String]) -> Result<(), String> {
         return Err("AUIG Error: missing input file".to_string());
     }
 
-    let source = load_and_expand(&args[2])?;
+    let mut user_components = std::collections::HashMap::new();
+    let mut active_kits = Vec::new();
 
-    let tokens = lex(&source)?;
-    let mut parser = Parser::new(tokens);
-    parser.parse_program()?;
+    let mut program = preprocessor::compile_file(&args[2], &mut user_components, &mut active_kits)?;
+    layout::apply_layouts(&mut program, &args[2])?;
+
+    for decl in &mut program.declarations {
+        match decl {
+            crate::ast::TopLevel::Page(page) => {
+                page.children = design_kit::transform_nodes(page.children.clone(), &user_components, &active_kits, &args[2])?;
+            }
+            crate::ast::TopLevel::Layout(layout) => {
+                layout.children = design_kit::transform_nodes(layout.children.clone(), &user_components, &active_kits, &args[2])?;
+            }
+            _ => {}
+        }
+    }
+
+    let mut used_flags = std::collections::HashSet::new();
+    generator::collect_program_flags(&program, &mut used_flags);
+    generator::validate_and_collect_jit_css(&used_flags, &args[2])?;
 
     println!("AUIG check passed.");
 
@@ -562,7 +662,7 @@ fn check_command(args: &[String]) -> Result<(), String> {
 }
 
 fn print_help() {
-    println!("AUIG v0.1");
+    println!("AUIG v1.0");
     println!();
     println!("Commands:");
     println!("  auig build <file.aui> --out <folder>");
@@ -573,4 +673,60 @@ fn print_help() {
     println!("  auig check --pages <folder>");
     println!("  auig tokens <file.aui>");
     println!("  auig ast <file.aui>");
+}
+
+fn match_dynamic_route(request_path: &str, out_dir: &str) -> Option<PathBuf> {
+    let clean_req = request_path.trim_matches('/');
+    let req_segments: Vec<&str> = clean_req.split('/').filter(|s| !s.is_empty()).collect();
+
+    let out_path = Path::new(out_dir);
+    let all_files = collect_all_html_files(out_path).ok()?;
+
+    for file in all_files {
+        if let Ok(rel) = file.strip_prefix(out_path) {
+            let mut route_path = rel.with_extension("");
+            if route_path.file_name().and_then(|f| f.to_str()) == Some("index") {
+                if let Some(parent) = route_path.parent() {
+                    route_path = parent.to_path_buf();
+                }
+            }
+            let route_str = route_path.to_str()?.replace('\\', "/");
+            let route_segments: Vec<&str> = route_str.split('/').filter(|s| !s.is_empty()).collect();
+
+            if req_segments.len() == route_segments.len() {
+                let mut matched = true;
+                for i in 0..req_segments.len() {
+                    let route_seg = route_segments[i];
+                    let req_seg = req_segments[i];
+                    if route_seg.starts_with('[') && route_seg.ends_with(']') {
+                        continue;
+                    }
+                    if route_seg != req_seg {
+                        matched = false;
+                        break;
+                    }
+                }
+                if matched {
+                    return Some(file);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn collect_all_html_files(dir: &Path) -> Result<Vec<PathBuf>, std::io::Error> {
+    let mut results = Vec::new();
+    if dir.is_dir() {
+        for entry in std::fs::read_dir(dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_dir() {
+                results.extend(collect_all_html_files(&path)?);
+            } else if path.extension().and_then(|ext| ext.to_str()) == Some("html") {
+                results.push(path);
+            }
+        }
+    }
+    Ok(results)
 }
