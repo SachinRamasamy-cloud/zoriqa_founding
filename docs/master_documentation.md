@@ -92,14 +92,36 @@ Layouts allow you to define persistent templates (e.g., headers, footers) shared
   * **At Least One Slot**: Failing to include a `slot` throws `AUIG Error: layout "LayoutName" must include one slot.`
   * **At Most One Slot**: Including multiple slots throws `AUIG Error: layout "LayoutName" cannot contain multiple slots.`
 
-### Statically Routeable Directories
-The pages directory structure maps directly to static routes in the output:
+### Compilation Modes & Routing
+
+AUIG V1.1 supports two build modes: **Static Mode** (default) and **Single-Page Application (SPA) Mode**.
+
+#### Static Mode
+Run build:
+```bash
+auig build --mode static --pages pages --out dist
+```
+The pages directory structure maps directly to static nested HTML folders and files in the output:
 * `pages/index.aui` $\rightarrow$ `/` (compiles to `dist/index.html`)
 * `pages/about.aui` $\rightarrow$ `/about` (compiles to `dist/about/index.html`)
-* `pages/users/[id].aui` $\rightarrow$ `/users/[id]` (compiles to `dist/users/[id]/index.html`)
+* `pages/users/[id].aui` $\rightarrow$ `/users/:id` (compiles to `dist/users/[id]/index.html`)
+
+#### SPA Mode (Single-Page Application)
+Run build:
+```bash
+auig build --mode spa --pages pages --out dist
+```
+All pages are compiled into a single HTML shell, a CSS file, and a client-side JavaScript router runtime:
+* `dist/index.html` (the SPA shell containing `<div id="auig-root"></div>`)
+* `dist/app.js` (the client-side router containing compiled HTML fragments and event listeners)
+* `dist/auig.css` (the bundled JIT CSS utilities)
 
 > [!IMPORTANT]
-> **Dynamic Routing Fallbacks**: Dynamic route files are compiled as static fallback templates. During development, `/users/123` can be matched to `/users/[id]/index.html`. No automatic data loading or route params are available yet.
+> **Dynamic Routing Matcher**: Dynamic route files are compiled to parameter pattern routes (e.g. `/users/:id`). During client-side navigation, the JS router matches the path pattern (e.g., `/users/123` matches `/users/:id`) and updates the container. No data binding or param interpolation in templates is supported yet.
+>
+> **Link click interception**: Local internal links (`data-auig-link` injected automatically by compiler) are intercepted at runtime by `app.js` and page content is swapped inline without a browser reload. Right-click, modifier clicks (Ctrl/Cmd/Shift/Alt), external links, and hash anchors are not intercepted.
+>
+> **Dev Server SPA Fallback**: The development server (`auig dev --mode spa`) automatically falls back to serving `dist/index.html` for any unmatched route paths that do not have file extensions, making manual refreshes work correctly.
 
 ---
 
