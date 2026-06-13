@@ -1,0 +1,17 @@
+import "components/layout.aui"
+
+page UserDetail layout Main:
+  title "User Profile"
+
+  view:
+    hero "User Profile Details" primary:
+      subtitle "Viewing user record from routing parameter"
+      badge "Dynamic Route" warning
+
+    section py-12:
+      card shadow-md bg-white text-gray-900 rounded-xl p-8 border border-gray-200:
+        h2 "User Information" bold mb-4
+        p "This page matches the pattern /users/:id dynamically."
+        row gap-medium mt-6:
+          btn "Back to Dashboard" to "/dashboard" primary
+          btn "Back Home" to "/" secondary

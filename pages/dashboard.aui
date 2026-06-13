@@ -1,24 +1,16 @@
-import "auig/ui"
+import "components/layout.aui"
 
-page Dashboard:
+page Dashboard layout Main:
   title "Dashboard"
 
   view:
-    navbar "AUIG" dark sticky:
-      link "Docs" to "/docs"
-      link "About" to "/about"
-      link "Dashboard" to "/dashboard"
-      link "Showcase" to "/page1"
-      action "Get Started" to "/docs"
-
     hero "Developer Console" primary:
       subtitle "Monitor compilation metrics, server requests, and asset generation statuses in real-time."
       badge "Live Console" success
 
     section py-12:
-      h2 "Performance Metrics" bold text-gray-900 mb-4
+      h2 "Performance Metrics" bold mb-4
       p "Status checks of the static compilation server and route optimization pipelines." muted mb-8
-
       row gap-large:
         stat-card "Pages Tracked" "5 Routes" success:
           badge "Optimal" success
@@ -29,34 +21,18 @@ page Dashboard:
 
     section py-12:
       row gap-large:
-        card bg-gray-900 text-white rounded-2xl p-8 shadow-lg w-full:
+        card shadow-lg w-full bg-gray-900 text-white rounded-2xl p-8:
           column gap-medium:
             badge "Compiler Logs" success
             h2 "Recent Compile Operations" bold text-white
-            
             row gap-large mt-6:
-              card bg-gray-950 text-white border border-gray-800 rounded-xl p-6:
+              card border border-gray-800 bg-gray-950 text-white rounded-xl p-6:
                 h2 "Page compilation" bold small text-green-600 mb-2
-                p "route '/' compiled in 0.4ms" text-inherit
-                p "route '/docs' compiled in 0.6ms" text-inherit
-                p "route '/dashboard' compiled in 0.5ms" text-inherit
-              card bg-gray-950 text-white border border-gray-800 rounded-xl p-6:
+                p "route '/' compiled in 0.4ms"
+                p "route '/docs' compiled in 0.6ms"
+                p "route '/dashboard' compiled in 0.5ms"
+              card border border-gray-800 bg-gray-950 text-white rounded-xl p-6:
                 h2 "Asset bundle logs" bold small text-blue-600 mb-2
-                p "JIT tokens found: 42 flags" text-inherit
-                p "CSS bundled in 0.3ms" text-inherit
-                p "Total size: 5.9 KB" text-inherit
-
-    footer "© 2026 AUIG Project. Open source software." dark:
-      row gap-large justify-between w-full:
-        column gap-small:
-          h2 "AUIG" bold text-white
-          p "The Python-like web layout compiler." small muted
-        column gap-small:
-          h2 "Pages" bold text-white
-          link "Home" to "/"
-          link "Docs" to "/docs"
-          link "About" to "/about"
-        column gap-small:
-          h2 "System" bold text-white
-          link "Dashboard" to "/dashboard"
-          link "Showcase" to "/page1"
+                p "JIT tokens found: 42 flags"
+                p "CSS bundled in 0.3ms"
+                p "Total size: 5.9 KB"

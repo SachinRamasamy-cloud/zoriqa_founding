@@ -1,19 +1,10 @@
-import "auig/ui"
+import "components/layout.aui"
 
-page Home:
+page Home layout Main:
   title "AUIG - Modern Indented Web Language"
 
   view:
-    navbar "AUIG" dark sticky:
-      link "Docs" to "/docs"
-      link "About" to "/about"
-      link "Dashboard" to "/dashboard"
-      link "Showcase" to "/page1"
-      action "Get Started" to "/docs"
-
-    alert "Release Alert" success:
-      message "AUIG v0.2 is officially live. Built in Rust, powered by a JIT utility CSS compiler."
-
+    alert "Release Alert" success
     hero "Write Less Code. Build Faster Websites." primary:
       subtitle "The indentation-based language for modern developers. Compile pythonic blocks directly to semantic HTML and JIT CSS."
       action "Start Documentation" to "/docs"
@@ -29,34 +20,24 @@ page Home:
           badge "Self-contained" warning
 
     section py-12:
-      h2 "High Performance, Low Boilerplate" bold text-gray-900 mb-4
+      h2 "High Performance, Low Boilerplate" bold mb-4
       p "Simplify your frontend workflow. Write clean structure without tag matching errors, and style instantly with built-in design kits." muted mb-8
-
       row gap-large:
-        feature-card "Indentation Syntax" primary:
-          icon code
-          desc "Python-like spacing replaces nested HTML closing tags, making layouts clean and readable."
+        box bg-blue-600 text-white rounded-2xl p-6 flex flex-col gap-medium border border-blue-700 shadow-md:
+          h2 "Indentation Syntax" bold
+          p "" muted small
+          icon "code"
+          p "Python-like spacing replaces nested HTML closing tags, making layouts clean and readable."
           badge "Clean" primary
-        feature-card "Just-in-Time CSS" success:
-          icon zap
-          desc "Only the utilities you actually reference in your files are generated in the final stylesheet."
+        box bg-green-50 text-green-900 rounded-2xl p-6 flex flex-col gap-medium border border-green-200 shadow-md:
+          h2 "Just-in-Time CSS" bold
+          p "" muted small
+          icon "zap"
+          p "Only the utilities you actually reference in your files are generated in the final stylesheet."
           badge "JIT" success
-        feature-card "Design Kit Presets" warning:
-          icon palette
-          desc "Get predesigned alerts, badges, navbars, cards, and pricing grids out of the box."
+        box bg-yellow-50 text-yellow-800 rounded-2xl p-6 flex flex-col gap-medium border border-yellow-200 shadow-md:
+          h2 "Design Kit Presets" bold
+          p "" muted small
+          icon "palette"
+          p "Get predesigned alerts, badges, navbars, cards, and pricing grids out of the box."
           badge "Bundled" warning
-
-    footer "© 2026 AUIG Project. Open source software." dark:
-      row gap-large justify-between w-full:
-        column gap-small:
-          h2 "AUIG" bold text-white
-          p "The Python-like web layout compiler." small muted
-        column gap-small:
-          h2 "Pages" bold text-white
-          link "Home" to "/"
-          link "Docs" to "/docs"
-          link "About" to "/about"
-        column gap-small:
-          h2 "System" bold text-white
-          link "Dashboard" to "/dashboard"
-          link "Showcase" to "/page1"

@@ -1,50 +1,33 @@
-import "auig/ui"
+import "components/layout.aui"
 
-page Showcase:
+page Showcase layout Main:
   title "AUIG - Showcase"
 
   view:
-    navbar "AUIG" dark sticky:
-      link "Docs" to "/docs"
-      link "About" to "/about"
-      link "Dashboard" to "/dashboard"
-      link "Showcase" to "/page1"
-      action "Get Started" to "/docs"
-
     hero "Web Layout Showcase" primary:
       subtitle "Explore standard static website layouts and designs crafted entirely in AUIG."
       action "Browse Templates" to "#templates"
       badge "Showcase Gallery" warning
 
     section py-12:
-      h2 "Predesigned Templates" bold text-gray-900 mb-4
+      h2 "Predesigned Templates" bold mb-4
       p "Deployable responsive wireframes ready to build your next web project." muted mb-8
-
       row gap-large:
-        feature-card "SaaS Landing Page" success:
-          icon zap
-          desc "Features hero section, dynamic pricing, and checkmark item support."
+        box bg-green-50 text-green-900 rounded-2xl p-6 flex flex-col gap-medium border border-green-200 shadow-md:
+          h2 "SaaS Landing Page" bold
+          p "" muted small
+          icon "zap"
+          p "Features hero section, dynamic pricing, and checkmark item support."
           badge "Recommended" success
-        feature-card "Blog Layout" primary:
-          icon code
-          desc "Minimalist spacing containing articles, author profiles, and read times."
+        box bg-blue-600 text-white rounded-2xl p-6 flex flex-col gap-medium border border-blue-700 shadow-md:
+          h2 "Blog Layout" bold
+          p "" muted small
+          icon "code"
+          p "Minimalist spacing containing articles, author profiles, and read times."
           badge "New" primary
-        feature-card "Developer Portfolio" warning:
-          icon palette
-          desc "Dark-mode layout optimized to show off GitHub projects and tech stacks."
+        box bg-yellow-50 text-yellow-800 rounded-2xl p-6 flex flex-col gap-medium border border-yellow-200 shadow-md:
+          h2 "Developer Portfolio" bold
+          p "" muted small
+          icon "palette"
+          p "Dark-mode layout optimized to show off GitHub projects and tech stacks."
           badge "High converting" warning
-
-    footer "© 2026 AUIG Project. Open source software." dark:
-      row gap-large justify-between w-full:
-        column gap-small:
-          h2 "AUIG" bold text-white
-          p "The Python-like web layout compiler." small muted
-        column gap-small:
-          h2 "Pages" bold text-white
-          link "Home" to "/"
-          link "Docs" to "/docs"
-          link "About" to "/about"
-        column gap-small:
-          h2 "System" bold text-white
-          link "Dashboard" to "/dashboard"
-          link "Showcase" to "/page1"

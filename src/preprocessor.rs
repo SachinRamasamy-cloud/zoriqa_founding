@@ -23,6 +23,8 @@ pub fn compile_file(
         format!("{} (in {})", e, input_file)
     })?;
 
+    let mut imported_layouts = Vec::new();
+
     // Collect imports and components from the program
     for decl in &program.declarations {
         match decl {
@@ -36,8 +38,14 @@ pub fn compile_file(
                     
                     // Merge component declarations from imported file
                     for sub_decl in sub_program.declarations {
-                        if let TopLevel::Component(comp) = sub_decl {
-                            user_components.insert(comp.name.clone(), comp);
+                        match sub_decl {
+                            TopLevel::Component(comp) => {
+                                user_components.insert(comp.name.clone(), comp);
+                            }
+                            TopLevel::Layout(layout) => {
+                                imported_layouts.push(TopLevel::Layout(layout));
+                            }
+                            _ => {}
                         }
                     }
                 }
@@ -49,6 +57,8 @@ pub fn compile_file(
         }
     }
 
+    let mut program = program;
+    program.declarations.extend(imported_layouts);
     Ok(program)
 }
 
