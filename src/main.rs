@@ -1,11 +1,13 @@
 mod ast;
+mod design_kit;
 mod generator;
+mod layout;
 mod lexer;
 mod parser;
 mod preprocessor;
 mod token;
-mod design_kit;
-mod layout;
+mod router;
+mod spa;
 mod tests;
 
 use std::env;
@@ -94,7 +96,7 @@ fn build_project(input_file: &str, out_dir: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn build_pages(pages_dir: &str, out_dir: &str) -> Result<(), String> {
+fn build_pages(pages_dir: &str, out_dir: &str, mode: BuildMode) -> Result<(), String> {
     let pages_path = PathBuf::from(pages_dir);
     let out_path = PathBuf::from(out_dir);
 
@@ -119,6 +121,7 @@ fn build_pages(pages_dir: &str, out_dir: &str) -> Result<(), String> {
 
     let mut used_flags = std::collections::HashSet::new();
     let mut pages_data = Vec::new();
+    let mut routes = Vec::new();
     let mut global_theme = None;
 
     let mut user_components = std::collections::HashMap::new();
@@ -159,24 +162,96 @@ fn build_pages(pages_dir: &str, out_dir: &str) -> Result<(), String> {
         }
 
         generator::collect_program_flags(&program, &mut used_flags);
-        let html = generator::generate_html(&program, &global_theme);
-        let output_file = route_output_path(&page_file, &pages_path, &out_path)?;
-        pages_data.push((output_file, html));
+
+        let page_decl = program.declarations.iter().find_map(|decl| match decl {
+            crate::ast::TopLevel::Page(p) => Some(p.clone()),
+            _ => None,
+        });
+
+        match mode {
+            BuildMode::Static => {
+                let html = generator::generate_html(&program, &global_theme);
+                let output_file = route_output_path(&page_file, &pages_path, &out_path)?;
+                pages_data.push((output_file, html));
+            }
+            BuildMode::Spa => {
+                let html_fragment = generator::generate_html_mode(
+                    &program,
+                    &global_theme,
+                    generator::RenderMode::HtmlFragment,
+                );
+                let route_path = router::route_from_page_path(&page_file, &pages_path);
+                let title = page_decl.as_ref().and_then(|p| p.title.clone());
+                let is_dynamic = router::is_dynamic_route(&route_path);
+
+                routes.push(router::RouteRecord {
+                    route_path,
+                    file_path: page_file.clone(),
+                    page_name: page_decl.as_ref().map(|p| p.name.clone()).unwrap_or_else(|| "Page".to_string()),
+                    html_fragment,
+                    title,
+                    is_dynamic,
+                });
+            }
+        }
     }
 
     // Validate utility classes
     generator::validate_and_collect_jit_css(&used_flags, "pages build")?;
 
-    for (output_file, html) in pages_data {
-        if let Some(parent) = output_file.parent() {
-            fs::create_dir_all(parent)
-                .map_err(|_| "AUIG Error: could not create route folder".to_string())?;
+    match mode {
+        BuildMode::Static => {
+            for (output_file, html) in pages_data {
+                if let Some(parent) = output_file.parent() {
+                    fs::create_dir_all(parent)
+                        .map_err(|_| "AUIG Error: could not create route folder".to_string())?;
+                }
+
+                fs::write(&output_file, html)
+                    .map_err(|_| format!("AUIG Error: could not write '{}'", output_file.display()))?;
+
+                println!("Route generated: {}", output_file.display());
+            }
         }
+        BuildMode::Spa => {
+            // Check if pages/404.aui is missing, if so, generate default 404
+            let has_404 = routes.iter().any(|r| r.route_path == "/404");
+            if !has_404 {
+                let default_404_html = r#"<main class="aui-center">
+  <h1 class="aui-heading aui-h1 aui-bold aui-large">404</h1>
+  <p class="aui-text">Page not found</p>
+</main>
+"#.to_string();
+                routes.push(router::RouteRecord {
+                    route_path: "/404".to_string(),
+                    file_path: PathBuf::from("pages/404.aui"),
+                    page_name: "404".to_string(),
+                    html_fragment: default_404_html,
+                    title: Some("404 Not Found".to_string()),
+                    is_dynamic: false,
+                });
+            }
 
-        fs::write(&output_file, html)
-            .map_err(|_| format!("AUIG Error: could not write '{}'", output_file.display()))?;
+            // Determine app title from index route or fallback
+            let index_title = routes
+                .iter()
+                .find(|r| r.route_path == "/")
+                .and_then(|r| r.title.clone())
+                .unwrap_or_else(|| "AUIG App".to_string());
 
-        println!("Route generated: {}", output_file.display());
+            let index_html = spa::generate_spa_index(&index_title);
+            let app_js = spa::generate_spa_runtime(&routes);
+
+            fs::write(out_path.join("index.html"), index_html)
+                .map_err(|_| "AUIG Error: could not write SPA index.html".to_string())?;
+
+            fs::write(out_path.join("app.js"), app_js)
+                .map_err(|_| "AUIG Error: could not write SPA app.js".to_string())?;
+
+            println!("SPA routes compiled: {}", routes.len());
+            println!("Route generated: {}", out_path.join("index.html").display());
+            println!("Route generated: {}", out_path.join("app.js").display());
+        }
     }
 
     let css = generator::generate_css(&used_flags, &global_theme);
@@ -320,9 +395,10 @@ fn latest_project_modified_time(paths: &[PathBuf]) -> Result<SystemTime, String>
 
 fn build_command(args: &[String]) -> Result<(), String> {
     let out_dir = parse_out_dir(args);
+    let mode = parse_mode(args);
 
     if let Some(pages_dir) = parse_pages_dir(args) {
-        build_pages(&pages_dir, &out_dir)?;
+        build_pages(&pages_dir, &out_dir, mode)?;
         println!("AUIG pages build complete.");
         println!("Generated routes in: {}", out_dir);
         return Ok(());
@@ -347,6 +423,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
     let out_dir = parse_out_dir(args);
     let port = parse_port(args);
     let pages_dir = parse_pages_dir(args);
+    let mode = parse_mode(args);
     let input_file = if pages_dir.is_none() {
         if args.len() < 3 {
             return Err("AUIG Error: missing input file".to_string());
@@ -358,7 +435,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
     };
 
     if let Some(pages_dir_value) = &pages_dir {
-        build_pages(pages_dir_value, &out_dir)?;
+        build_pages(pages_dir_value, &out_dir, mode)?;
     } else if let Some(input_file_value) = &input_file {
         build_project(input_file_value, &out_dir)?;
     }
@@ -399,7 +476,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
                     Ok(latest_time) => {
                         if latest_time > last_build_time {
                             if let Some(pages_dir_value) = &pages_dir {
-                                if let Err(error) = build_pages(pages_dir_value, &out_dir) {
+                                if let Err(error) = build_pages(pages_dir_value, &out_dir, mode) {
                                     eprintln!("{}", error);
                                 }
                             } else if let Some(input_file_value) = &input_file {
@@ -417,7 +494,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
                     }
                 }
 
-                if let Err(error) = handle_request(stream, &out_dir) {
+                if let Err(error) = handle_request(stream, &out_dir, mode) {
                     eprintln!("{}", error);
                 }
             }
@@ -430,7 +507,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
-fn handle_request(mut stream: TcpStream, out_dir: &str) -> Result<(), String> {
+fn handle_request(mut stream: TcpStream, out_dir: &str, mode: BuildMode) -> Result<(), String> {
     let mut buffer = [0; 1024];
 
     stream
@@ -451,6 +528,8 @@ fn handle_request(mut stream: TcpStream, out_dir: &str) -> Result<(), String> {
 
         if direct_file.exists() && direct_file.is_file() {
             direct_file
+        } else if mode == BuildMode::Spa {
+            PathBuf::from(out_dir).join("index.html")
         } else {
             PathBuf::from(out_dir).join(clean_path).join("index.html")
         }
@@ -729,4 +808,24 @@ fn collect_all_html_files(dir: &Path) -> Result<Vec<PathBuf>, std::io::Error> {
         }
     }
     Ok(results)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BuildMode {
+    Static,
+    Spa,
+}
+
+fn parse_mode(args: &[String]) -> BuildMode {
+    let mut i = 0;
+    while i < args.len() {
+        if args[i] == "--mode" && i + 1 < args.len() {
+            match args[i + 1].as_str() {
+                "spa" => return BuildMode::Spa,
+                _ => return BuildMode::Static,
+            }
+        }
+        i += 1;
+    }
+    BuildMode::Static
 }

@@ -1,7 +1,17 @@
 use crate::ast::{ElementNode, Node, Program, ThemeDecl};
 use std::collections::{HashMap, HashSet};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RenderMode {
+    StaticDocument,
+    HtmlFragment,
+}
+
 pub fn generate_html(program: &Program, theme: &Option<ThemeDecl>) -> String {
+    generate_html_mode(program, theme, RenderMode::StaticDocument)
+}
+
+pub fn generate_html_mode(program: &Program, theme: &Option<ThemeDecl>, mode: RenderMode) -> String {
     // Find first page declaration
     let page_decl = program.declarations.iter().find_map(|decl| match decl {
         crate::ast::TopLevel::Page(p) => Some(p),
@@ -16,13 +26,16 @@ pub fn generate_html(program: &Program, theme: &Option<ThemeDecl>) -> String {
         None => ("AUIG Website".to_string(), &Vec::new()),
     };
 
+    let spa_mode = mode == RenderMode::HtmlFragment;
     let mut body = String::new();
     for child in children {
-        body.push_str(&render_node(child, theme, 2));
+        body.push_str(&render_node(child, theme, 2, spa_mode));
     }
 
-    format!(
-        r#"<!doctype html>
+    match mode {
+        RenderMode::StaticDocument => {
+            format!(
+                r#"<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -35,9 +48,14 @@ pub fn generate_html(program: &Program, theme: &Option<ThemeDecl>) -> String {
 </body>
 </html>
 "#,
-        escape_html(&title),
-        body
-    )
+                escape_html(&title),
+                body
+            )
+        }
+        RenderMode::HtmlFragment => {
+            body
+        }
+    }
 }
 
 pub fn collect_program_flags(program: &Program, flags: &mut HashSet<String>) {
@@ -501,20 +519,20 @@ body {
     base_css
 }
 
-fn render_node(node: &Node, theme: &Option<ThemeDecl>, indent: usize) -> String {
+fn render_node(node: &Node, theme: &Option<ThemeDecl>, indent: usize, spa_mode: bool) -> String {
     let space = " ".repeat(indent);
     match node {
         Node::Text(t) => {
             format!("{}{}\n", space, escape_html(&t.content))
         }
         Node::Element(e) => {
-            let tag = if e.props.contains_key("to") && (e.tag == "btn" || e.tag == "button") {
+            let tag = if e.props.contains_key("to") && (e.tag == "btn" || e.tag == "button" || e.tag == "action") {
                 "a"
             } else {
                 html_tag(&e.tag)
             };
             let class = class_name(e);
-            let attrs = html_attrs(e);
+            let attrs = html_attrs(e, spa_mode);
 
             let mut output = String::new();
             if e.children.is_empty() && e.args.is_empty() {
@@ -525,7 +543,7 @@ fn render_node(node: &Node, theme: &Option<ThemeDecl>, indent: usize) -> String 
                     output.push_str(&format!("{}  {}\n", space, escape_html(arg.as_str())));
                 }
                 for child in &e.children {
-                    output.push_str(&render_node(child, theme, indent + 2));
+                    output.push_str(&render_node(child, theme, indent + 2, spa_mode));
                 }
                 output.push_str(&format!("{}</{}>\n", space, tag));
             }
@@ -547,7 +565,7 @@ fn html_tag(kind: &str) -> &'static str {
         "h2" => "h2",
         "h3" => "h3",
         "p" | "text" | "subtitle" | "desc" | "message" => "p",
-        "btn" | "button" => "button",
+        "btn" | "button" | "action" => "button",
         "link" | "a" => "a",
         "row" | "column" | "col" | "center" | "card" | "section" | "box" => "div",
         "item" => "li",
@@ -582,7 +600,7 @@ fn class_name(node: &ElementNode) -> String {
         }
         "p" | "text" | "subtitle" | "desc" | "message" => classes.push("aui-text".to_string()),
         "icon" | "span" => classes.push(format!("aui-{}", node.tag)),
-        "btn" | "button" => classes.push("aui-button".to_string()),
+        "btn" | "button" | "action" => classes.push("aui-button".to_string()),
         "link" | "a" => classes.push("aui-link".to_string()),
         "row" => classes.push("aui-row".to_string()),
         "column" | "col" => classes.push("aui-column".to_string()),
@@ -615,11 +633,25 @@ fn escape_html(value: &str) -> String {
         .replace('"', "&quot;")
 }
 
-fn html_attrs(node: &ElementNode) -> String {
+fn html_attrs(node: &ElementNode, spa_mode: bool) -> String {
     let mut attrs = String::new();
+    let mut has_to = false;
+    let mut is_local_to = false;
     for (name, val) in &node.props {
-        let attr_name = if name == "to" { "href" } else { name };
+        let attr_name = if name == "to" {
+            has_to = true;
+            let val_str = val.as_str();
+            if !val_str.starts_with("http") && !val_str.starts_with('#') {
+                is_local_to = true;
+            }
+            "href"
+        } else {
+            name
+        };
         attrs.push_str(&format!(" {}=\"{}\"", escape_html(attr_name), escape_html(val.as_str())));
+    }
+    if spa_mode && has_to && is_local_to && matches!(node.tag.as_str(), "link" | "a" | "btn" | "button" | "action") {
+        attrs.push_str(" data-auig-link");
     }
     attrs
 }

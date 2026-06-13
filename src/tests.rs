@@ -252,4 +252,162 @@ page Home:
             );
         }
     }
+
+    #[test]
+    fn test_spa_route_mappings() {
+        use std::path::Path;
+        let pages_dir = Path::new("pages");
+        
+        // Simple routes
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/index.aui"), pages_dir), "/");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/about.aui"), pages_dir), "/about");
+        
+        // Nested routes
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/dashboard/index.aui"), pages_dir), "/dashboard");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/users/[id].aui"), pages_dir), "/users/:id");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/users/[id]/profile.aui"), pages_dir), "/users/:id/profile");
+        
+        // Dynamic check
+        assert!(crate::router::is_dynamic_route("/users/:id"));
+        assert!(!crate::router::is_dynamic_route("/about"));
+    }
+
+    #[test]
+    fn test_spa_generation() {
+        use std::path::PathBuf;
+        let index = crate::spa::generate_spa_index("Test App");
+        assert!(index.contains("<title>Test App</title>"));
+        assert!(index.contains("<div id=\"auig-root\"></div>"));
+        assert!(index.contains("<script src=\"/app.js\"></script>"));
+
+        let routes = vec![
+            crate::router::RouteRecord {
+                route_path: "/".to_string(),
+                file_path: PathBuf::from("pages/index.aui"),
+                page_name: "Home".to_string(),
+                html_fragment: "<main>Home Fragment</main>".to_string(),
+                title: Some("Home".to_string()),
+                is_dynamic: false,
+            },
+            crate::router::RouteRecord {
+                route_path: "/users/:id".to_string(),
+                file_path: PathBuf::from("pages/users/[id].aui"),
+                page_name: "UserDetail".to_string(),
+                html_fragment: "<main>User Detail Fragment</main>".to_string(),
+                title: Some("User Profile".to_string()),
+                is_dynamic: true,
+            }
+        ];
+
+        let runtime = crate::spa::generate_spa_runtime(&routes);
+        assert!(runtime.contains("path: \"/\""));
+        assert!(runtime.contains("path: \"/users/:id\""));
+        assert!(runtime.contains("Home Fragment"));
+        assert!(runtime.contains("User Detail Fragment"));
+        assert!(runtime.contains("function matchRoute("));
+        assert!(runtime.contains("function matchPath("));
+        assert!(runtime.contains("history.pushState"));
+    }
+
+    #[test]
+    fn test_spa_link_attribute_rendering() {
+        use crate::ast::{ElementNode, Node, Value, StyleOverrides};
+        use std::collections::HashMap;
+
+        // Local link in SPA mode gets data-auig-link
+        let local_link = ElementNode {
+            tag: "link".to_string(),
+            args: vec![Value::String("About".to_string())],
+            props: {
+                let mut p = HashMap::new();
+                p.insert("to".to_string(), Value::String("/about".to_string()));
+                p
+            },
+            flags: Vec::new(),
+            children: Vec::new(),
+            style: StyleOverrides::default(),
+            line: 1,
+        };
+        let html = crate::generator::generate_html_mode(
+            &crate::ast::Program {
+                declarations: vec![crate::ast::TopLevel::Page(crate::ast::PageDecl {
+                    name: "Home".to_string(),
+                    layout: None,
+                    title: None,
+                    children: vec![Node::Element(local_link)],
+                    line: 1,
+                })],
+            },
+            &None,
+            crate::generator::RenderMode::HtmlFragment,
+        );
+        assert!(html.contains("data-auig-link"));
+        assert!(html.contains("href=\"/about\""));
+
+        // External link does NOT get data-auig-link
+        let external_link = ElementNode {
+            tag: "link".to_string(),
+            args: vec![Value::String("GitHub".to_string())],
+            props: {
+                let mut p = HashMap::new();
+                p.insert("to".to_string(), Value::String("https://github.com".to_string()));
+                p
+            },
+            flags: Vec::new(),
+            children: Vec::new(),
+            style: StyleOverrides::default(),
+            line: 1,
+        };
+        let html_ext = crate::generator::generate_html_mode(
+            &crate::ast::Program {
+                declarations: vec![crate::ast::TopLevel::Page(crate::ast::PageDecl {
+                    name: "Home".to_string(),
+                    layout: None,
+                    title: None,
+                    children: vec![Node::Element(external_link)],
+                    line: 1,
+                })],
+            },
+            &None,
+            crate::generator::RenderMode::HtmlFragment,
+        );
+        assert!(!html_ext.contains("data-auig-link"));
+        assert!(html_ext.contains("href=\"https://github.com\""));
+
+        // Anchor link does NOT get data-auig-link
+        let anchor_link = ElementNode {
+            tag: "link".to_string(),
+            args: vec![Value::String("Section".to_string())],
+            props: {
+                let mut p = HashMap::new();
+                p.insert("to".to_string(), Value::String("#section".to_string()));
+                p
+            },
+            flags: Vec::new(),
+            children: Vec::new(),
+            style: StyleOverrides::default(),
+            line: 1,
+        };
+        let html_anch = crate::generator::generate_html_mode(
+            &crate::ast::Program {
+                declarations: vec![crate::ast::TopLevel::Page(crate::ast::PageDecl {
+                    name: "Home".to_string(),
+                    layout: None,
+                    title: None,
+                    children: vec![Node::Element(anchor_link)],
+                    line: 1,
+                })],
+            },
+            &None,
+            crate::generator::RenderMode::HtmlFragment,
+        );
+        assert!(!html_anch.contains("data-auig-link"));
+        assert!(html_anch.contains("href=\"#section\""));
+    }
+
+    #[test]
+    fn test_spa_server_fallback() {
+        let mode = crate::BuildMode::Spa;
+        assert_eq!(mode, crate::BuildMode::Spa);
+    }
 }
