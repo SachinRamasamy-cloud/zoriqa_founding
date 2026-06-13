@@ -1,5 +1,24 @@
 use crate::router::RouteRecord;
 
+pub fn escape_js_string(value: &str) -> String {
+    let mut escaped = String::new();
+    for c in value.chars() {
+        match c {
+            '\\' => escaped.push_str("\\\\"),
+            '"' => escaped.push_str("\\\""),
+            '\'' => escaped.push_str("\\'"),
+            '`' => escaped.push_str("\\`"),
+            '\n' => escaped.push_str("\\n"),
+            '\r' => escaped.push_str("\\r"),
+            '\u{2028}' => escaped.push_str("\\u2028"),
+            '\u{2029}' => escaped.push_str("\\u2029"),
+            _ => escaped.push(c),
+        }
+    }
+    escaped.replace("</script>", "<\\/script>")
+}
+
+
 pub fn generate_spa_index(app_title: &str) -> String {
     format!(
         r#"<!DOCTYPE html>
@@ -23,12 +42,8 @@ pub fn generate_spa_runtime(routes: &[RouteRecord]) -> String {
     let mut routes_json = String::new();
     routes_json.push_str("[\n");
     for r in routes {
-        let title_escaped = r.title.as_deref().unwrap_or("AUIG App").replace('"', "\\\"");
-        let html_escaped = r.html_fragment
-            .replace('\\', "\\\\")
-            .replace('"', "\\\"")
-            .replace('\n', "\\n")
-            .replace('\r', "");
+        let title_escaped = escape_js_string(r.title.as_deref().unwrap_or("AUIG App"));
+        let html_escaped = escape_js_string(&r.html_fragment);
         routes_json.push_str(&format!(
             "  {{\n    path: \"{}\",\n    title: \"{}\",\n    html: \"{}\"\n  }},\n",
             r.route_path, title_escaped, html_escaped
@@ -109,11 +124,19 @@ function navigate(path) {{
 }}
 
 document.addEventListener("click", function (event) {{
+  if (event.defaultPrevented) return;
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  if (event.button !== 0) return;
+
   const link = event.target.closest("a[data-auig-link]");
   if (!link) return;
 
+  const target = link.getAttribute("target");
+  if (target && target !== "_self") return;
+  if (link.hasAttribute("download")) return;
+
   const href = link.getAttribute("href");
-  if (!href || href.startsWith("http") || href.startsWith("#")) {{
+  if (!href || href.startsWith("http") || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) {{
     return;
   }}
 

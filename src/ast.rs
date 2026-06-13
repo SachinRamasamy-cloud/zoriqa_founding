@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -100,6 +98,7 @@ pub enum Node {
 }
 
 impl Node {
+    #[allow(dead_code)]
     pub fn line(&self) -> usize {
         match self {
             Node::Element(e) => e.line,
@@ -111,6 +110,7 @@ impl Node {
 
 #[derive(Debug, Clone)]
 pub struct ThemeDecl {
+    #[allow(dead_code)]
     pub name: Option<String>,
     pub variables: HashMap<String, String>,
 }
@@ -136,6 +136,7 @@ pub struct ComponentDecl {
     pub name: String,
     pub params: Vec<String>,
     pub children: Vec<Node>,
+    #[allow(dead_code)]
     pub line: usize,
 }
 

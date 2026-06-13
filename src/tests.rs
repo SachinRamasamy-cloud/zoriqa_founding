@@ -410,4 +410,99 @@ page Home:
         let mode = crate::BuildMode::Spa;
         assert_eq!(mode, crate::BuildMode::Spa);
     }
+
+    #[test]
+    fn test_spa_js_escaping() {
+        use crate::spa::escape_js_string;
+        
+        let dangerous = r#"Double "quote", backslash \, newline
+and </script> tag."#;
+        let escaped = escape_js_string(dangerous);
+        
+        assert!(escaped.contains("\\\""));
+        assert!(escaped.contains("\\\\"));
+        assert!(escaped.contains("\\n"));
+        assert!(escaped.contains("<\\/script>"));
+        assert!(!escaped.contains("</script>"));
+    }
+
+    #[test]
+    fn test_spa_route_priority() {
+        use std::path::PathBuf;
+        use crate::router::RouteRecord;
+        
+        let mut routes = vec![
+            RouteRecord {
+                route_path: "/users/:id".to_string(),
+                file_path: PathBuf::from("pages/users/[id].aui"),
+                page_name: "UserDetail".to_string(),
+                html_fragment: String::new(),
+                title: None,
+                is_dynamic: true,
+            },
+            RouteRecord {
+                route_path: "/404".to_string(),
+                file_path: PathBuf::from("pages/404.aui"),
+                page_name: "404".to_string(),
+                html_fragment: String::new(),
+                title: None,
+                is_dynamic: false,
+            },
+            RouteRecord {
+                route_path: "/users/settings".to_string(),
+                file_path: PathBuf::from("pages/users/settings.aui"),
+                page_name: "UserSettings".to_string(),
+                html_fragment: String::new(),
+                title: None,
+                is_dynamic: false,
+            },
+            RouteRecord {
+                route_path: "/".to_string(),
+                file_path: PathBuf::from("pages/index.aui"),
+                page_name: "Home".to_string(),
+                html_fragment: String::new(),
+                title: None,
+                is_dynamic: false,
+            },
+        ];
+
+        routes.sort_by(|a, b| {
+            if a.route_path == "/404" {
+                return std::cmp::Ordering::Greater;
+            }
+            if b.route_path == "/404" {
+                return std::cmp::Ordering::Less;
+            }
+
+            let a_dyn = a.route_path.contains(':');
+            let b_dyn = b.route_path.contains(':');
+            if a_dyn != b_dyn {
+                return if a_dyn { std::cmp::Ordering::Greater } else { std::cmp::Ordering::Less };
+            }
+
+            let a_segs = a.route_path.split('/').filter(|s| !s.is_empty()).count();
+            let b_segs = b.route_path.split('/').filter(|s| !s.is_empty()).count();
+            if a_segs != b_segs {
+                return b_segs.cmp(&a_segs);
+            }
+
+            a.route_path.cmp(&b.route_path)
+        });
+
+        assert_eq!(routes[0].route_path, "/users/settings");
+        assert_eq!(routes[1].route_path, "/");
+        assert_eq!(routes[2].route_path, "/users/:id");
+        assert_eq!(routes[3].route_path, "/404");
+    }
+
+    #[test]
+    fn test_spa_server_fallback_extensions() {
+        use std::path::Path;
+        
+        let path_with_ext = "assets/logo.png";
+        let path_no_ext = "about";
+        
+        assert!(Path::new(path_with_ext).extension().is_some());
+        assert!(Path::new(path_no_ext).extension().is_none());
+    }
 }

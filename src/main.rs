@@ -232,6 +232,30 @@ fn build_pages(pages_dir: &str, out_dir: &str, mode: BuildMode) -> Result<(), St
                 });
             }
 
+            // Sort routes by priority
+            routes.sort_by(|a, b| {
+                if a.route_path == "/404" {
+                    return std::cmp::Ordering::Greater;
+                }
+                if b.route_path == "/404" {
+                    return std::cmp::Ordering::Less;
+                }
+
+                let a_dyn = a.route_path.contains(':');
+                let b_dyn = b.route_path.contains(':');
+                if a_dyn != b_dyn {
+                    return if a_dyn { std::cmp::Ordering::Greater } else { std::cmp::Ordering::Less };
+                }
+
+                let a_segs = a.route_path.split('/').filter(|s| !s.is_empty()).count();
+                let b_segs = b.route_path.split('/').filter(|s| !s.is_empty()).count();
+                if a_segs != b_segs {
+                    return b_segs.cmp(&a_segs);
+                }
+
+                a.route_path.cmp(&b.route_path)
+            });
+
             // Determine app title from index route or fallback
             let index_title = routes
                 .iter()
@@ -529,7 +553,13 @@ fn handle_request(mut stream: TcpStream, out_dir: &str, mode: BuildMode) -> Resu
         if direct_file.exists() && direct_file.is_file() {
             direct_file
         } else if mode == BuildMode::Spa {
-            PathBuf::from(out_dir).join("index.html")
+            let clean_path = path.trim_start_matches('/');
+            let has_extension = Path::new(clean_path).extension().is_some();
+            if has_extension {
+                direct_file
+            } else {
+                PathBuf::from(out_dir).join("index.html")
+            }
         } else {
             PathBuf::from(out_dir).join(clean_path).join("index.html")
         }
