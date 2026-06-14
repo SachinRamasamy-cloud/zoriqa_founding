@@ -41,7 +41,7 @@ jobs:
       - name: Build release binary
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Prepare artifact on Linux/macOS
+      - name: Prepare artifact on Linux or macOS
         if: runner.os != 'Windows'
         run: |
           mkdir -p artifacts
