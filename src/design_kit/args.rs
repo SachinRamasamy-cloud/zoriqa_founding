@@ -31,7 +31,7 @@ pub fn parse_ui_call(header_line: &str, block_lines: &[String]) -> Result<UiCall
 
     let tokens = tokenize(trimmed_header);
     if tokens.is_empty() {
-        return Err("AUIG Error: empty UI call line".to_string());
+        return Err("Zoriqa Error: empty UI call line".to_string());
     }
 
     let name = tokens[0].clone();

@@ -1,11 +1,11 @@
 use super::args::UiCall;
 use super::styles::resolve_design;
-use super::{reindent_block_lines, safe_aui_string};
+use super::{reindent_block_lines, safe_zq_string};
 
 pub fn expand_footer(call: &UiCall, indent: &str) -> Result<String, String> {
     let copyright = call.positional.first().map(|s| s.as_str())
         .or_else(|| call.props.get("copyright").map(|s| s.as_str()))
-        .unwrap_or("© 2026 AUIG");
+        .unwrap_or("© 2026 Zoriqa");
 
     let tone = call.flags.iter().find(|f| matches!(f.as_str(), "primary" | "success" | "warning" | "danger" | "info" | "dark" | "light" | "neutral")).map(|s| s.as_str());
 
@@ -24,7 +24,7 @@ pub fn expand_footer(call: &UiCall, indent: &str) -> Result<String, String> {
     }
 
     output.push_str(&format!("{}    row justify-between items-center border-t border-{} pt-8 mt-8:\n", indent, resolved.border));
-    output.push_str(&format!("{}      p \"{}\" muted small\n", indent, safe_aui_string(copyright)));
+    output.push_str(&format!("{}      p \"{}\" muted small\n", indent, safe_zq_string(copyright)));
 
     Ok(output.trim_end().to_string())
 }

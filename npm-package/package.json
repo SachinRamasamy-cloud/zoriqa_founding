@@ -1,0 +1,32 @@
+{
+  "name": "zoriqa",
+  "version": "0.1.0",
+  "description": "Zoriqa - a .zq website compiler and SPA navigation tool.",
+  "bin": {
+    "zoriqa": "./bin/cli.js",
+    "zq": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "zoriqa",
+    "zq",
+    "compiler",
+    "static-site",
+    "spa",
+    "website",
+    "web-language"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/SachinRamasamy-cloud/zoriqa_founding#readme",
+  "bugs": {
+    "url": "https://github.com/SachinRamasamy-cloud/zoriqa_founding/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SachinRamasamy-cloud/zoriqa_founding.git"
+  }
+}

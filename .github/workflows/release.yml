@@ -1,0 +1,61 @@
+name: Build Zoriqa binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            output: zoriqa-linux-x64
+            source: zoriqa
+
+          - os: macos-13
+            target: x86_64-apple-darwin
+            output: zoriqa-macos-x64
+            source: zoriqa
+
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            output: zoriqa-macos-arm64
+            source: zoriqa
+
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            output: zoriqa-windows-x64.exe
+            source: zoriqa.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add Rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Prepare artifact on Linux/macOS
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p artifacts
+          cp target/${{ matrix.target }}/release/${{ matrix.source }} artifacts/${{ matrix.output }}
+          chmod +x artifacts/${{ matrix.output }}
+
+      - name: Prepare artifact on Windows
+        if: runner.os == 'Windows'
+        run: |
+          mkdir artifacts
+          copy target\${{ matrix.target }}\release\${{ matrix.source }} artifacts\${{ matrix.output }}
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output }}
+          path: artifacts/${{ matrix.output }}

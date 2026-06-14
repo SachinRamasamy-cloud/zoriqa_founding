@@ -1,17 +1,17 @@
-import "components/layout.aui"
+import "components/layout.zq"
 
 page About layout Main:
-  title "About AUIG"
+  title "About Zoriqa"
 
   view:
     hero "About the Compiler" primary:
-      subtitle "Learn about the mission, architecture, and technology behind the AUIG layout system."
+      subtitle "Learn about the mission, architecture, and technology behind the Zoriqa layout system."
       action "Read Docs" to "/docs"
       badge "Rust Powered" success
 
     section py-12:
       h2 "The Mission" bold mb-4
-      p "AUIG was created to bridge the gap between simple pythonic indentation syntax and high-performance, modern static websites. By compiling layouts at build-time, we deliver lightning-fast page loading speeds with zero client-side framework overhead." muted mb-8
+      p "Zoriqa was created to bridge the gap between simple pythonic indentation syntax and high-performance, modern static websites. By compiling layouts at build-time, we deliver lightning-fast page loading speeds with zero client-side framework overhead." muted mb-8
       row gap-large:
         box bg-green-50 text-green-900 rounded-2xl p-6 flex flex-col gap-medium border border-green-200 shadow-md:
           h2 "Build Speed" bold

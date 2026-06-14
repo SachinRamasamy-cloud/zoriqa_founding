@@ -12,7 +12,7 @@ mod tests {
 
     #[test]
     fn test_lexer() {
-        let src = "import \"auig/ui\"\npage Home:\n  title \"Test\"\n  navbar \"AUIG\" dark";
+        let src = "import \"zoriqa/ui\"\npage Home:\n  title \"Test\"\n  navbar \"Zoriqa\" dark";
         let tokens = lex(src).unwrap();
         assert!(!tokens.is_empty());
     }
@@ -20,7 +20,7 @@ mod tests {
     #[test]
     fn test_parser_and_ast() {
         let src = "
-import \"auig/ui\"
+import \"zoriqa/ui\"
 theme:
   primary blue
   success green
@@ -57,7 +57,7 @@ page Home layout Main:
             style: Default::default(),
             line: 1,
         };
-        assert!(validate_component(&comp, "test.aui").is_ok());
+        assert!(validate_component(&comp, "test.zq").is_ok());
 
         // Invalid stat-card (missing value argument)
         let comp_invalid = ComponentNode {
@@ -69,7 +69,7 @@ page Home layout Main:
             style: Default::default(),
             line: 1,
         };
-        assert!(validate_component(&comp_invalid, "test.aui").is_err());
+        assert!(validate_component(&comp_invalid, "test.zq").is_err());
     }
 
     #[test]
@@ -100,7 +100,7 @@ page Home layout Main:
         let tokens = lex(src).unwrap();
         let mut parser = Parser::new(tokens);
         let mut program = parser.parse_program().unwrap();
-        apply_layouts(&mut program, "test.aui").unwrap();
+        apply_layouts(&mut program, "test.zq").unwrap();
 
         // Check page children: should contain view, which contains h1 "Hello"
         let page = program.declarations.iter().find_map(|d| match d {
@@ -125,7 +125,7 @@ page Home layout Main:
     #[test]
     fn test_dynamic_routing() {
         // Setup temporary directory structure to simulate output dir
-        let temp_dir = std::env::temp_dir().join("auig_test_routing");
+        let temp_dir = std::env::temp_dir().join("zoriqa_test_routing");
         let users_id_dir = temp_dir.join("users").join("[id]");
         std::fs::create_dir_all(&users_id_dir).unwrap();
         std::fs::write(users_id_dir.join("index.html"), "test").unwrap();
@@ -157,12 +157,12 @@ page Home layout Main:
         used_flags.insert("text-right".to_string());
         used_flags.insert("text-center".to_string());
         used_flags.insert("flex".to_string());
-        assert!(validate_and_collect_jit_css(&used_flags, "test.aui").is_ok());
+        assert!(validate_and_collect_jit_css(&used_flags, "test.zq").is_ok());
 
         // Test spelling suggestion error
         let mut bad_flags = HashSet::new();
         bad_flags.insert("bg-greeen-50".to_string());
-        let res = validate_and_collect_jit_css(&bad_flags, "test.aui");
+        let res = validate_and_collect_jit_css(&bad_flags, "test.zq");
         assert!(res.is_err());
         assert!(res.unwrap_err().contains("Did you mean:\nbg-green-50"));
     }
@@ -178,7 +178,7 @@ layout Main:
         let tokens = lex(src_no_slot).unwrap();
         let mut parser = Parser::new(tokens);
         let mut program = parser.parse_program().unwrap();
-        let res = apply_layouts(&mut program, "test.aui");
+        let res = apply_layouts(&mut program, "test.zq");
         assert!(res.is_err());
         assert!(res.unwrap_err().contains("must include one slot"));
 
@@ -192,7 +192,7 @@ layout Main:
         let tokens = lex(src_multi_slot).unwrap();
         let mut parser = Parser::new(tokens);
         let mut program = parser.parse_program().unwrap();
-        let res = apply_layouts(&mut program, "test.aui");
+        let res = apply_layouts(&mut program, "test.zq");
         assert!(res.is_err());
         assert!(res.unwrap_err().contains("cannot contain multiple slots"));
     }
@@ -259,13 +259,13 @@ page Home:
         let pages_dir = Path::new("pages");
         
         // Simple routes
-        assert_eq!(crate::router::route_from_page_path(Path::new("pages/index.aui"), pages_dir), "/");
-        assert_eq!(crate::router::route_from_page_path(Path::new("pages/about.aui"), pages_dir), "/about");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/index.zq"), pages_dir), "/");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/about.zq"), pages_dir), "/about");
         
         // Nested routes
-        assert_eq!(crate::router::route_from_page_path(Path::new("pages/dashboard/index.aui"), pages_dir), "/dashboard");
-        assert_eq!(crate::router::route_from_page_path(Path::new("pages/users/[id].aui"), pages_dir), "/users/:id");
-        assert_eq!(crate::router::route_from_page_path(Path::new("pages/users/[id]/profile.aui"), pages_dir), "/users/:id/profile");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/dashboard/index.zq"), pages_dir), "/dashboard");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/users/[id].zq"), pages_dir), "/users/:id");
+        assert_eq!(crate::router::route_from_page_path(Path::new("pages/users/[id]/profile.zq"), pages_dir), "/users/:id/profile");
         
         // Dynamic check
         assert!(crate::router::is_dynamic_route("/users/:id"));
@@ -277,13 +277,13 @@ page Home:
         use std::path::PathBuf;
         let index = crate::spa::generate_spa_index("Test App");
         assert!(index.contains("<title>Test App</title>"));
-        assert!(index.contains("<div id=\"auig-root\"></div>"));
+        assert!(index.contains("<div id=\"zoriqa-root\"></div>"));
         assert!(index.contains("<script src=\"/app.js\"></script>"));
 
         let routes = vec![
             crate::router::RouteRecord {
                 route_path: "/".to_string(),
-                file_path: PathBuf::from("pages/index.aui"),
+                file_path: PathBuf::from("pages/index.zq"),
                 page_name: "Home".to_string(),
                 html_fragment: "<main>Home Fragment</main>".to_string(),
                 title: Some("Home".to_string()),
@@ -291,7 +291,7 @@ page Home:
             },
             crate::router::RouteRecord {
                 route_path: "/users/:id".to_string(),
-                file_path: PathBuf::from("pages/users/[id].aui"),
+                file_path: PathBuf::from("pages/users/[id].zq"),
                 page_name: "UserDetail".to_string(),
                 html_fragment: "<main>User Detail Fragment</main>".to_string(),
                 title: Some("User Profile".to_string()),
@@ -314,7 +314,7 @@ page Home:
         use crate::ast::{ElementNode, Node, Value, StyleOverrides};
         use std::collections::HashMap;
 
-        // Local link in SPA mode gets data-auig-link
+        // Local link in SPA mode gets data-zoriqa-link
         let local_link = ElementNode {
             tag: "link".to_string(),
             args: vec![Value::String("About".to_string())],
@@ -341,10 +341,10 @@ page Home:
             &None,
             crate::generator::RenderMode::HtmlFragment,
         );
-        assert!(html.contains("data-auig-link"));
+        assert!(html.contains("data-zoriqa-link"));
         assert!(html.contains("href=\"/about\""));
 
-        // External link does NOT get data-auig-link
+        // External link does NOT get data-zoriqa-link
         let external_link = ElementNode {
             tag: "link".to_string(),
             args: vec![Value::String("GitHub".to_string())],
@@ -371,10 +371,10 @@ page Home:
             &None,
             crate::generator::RenderMode::HtmlFragment,
         );
-        assert!(!html_ext.contains("data-auig-link"));
+        assert!(!html_ext.contains("data-zoriqa-link"));
         assert!(html_ext.contains("href=\"https://github.com\""));
 
-        // Anchor link does NOT get data-auig-link
+        // Anchor link does NOT get data-zoriqa-link
         let anchor_link = ElementNode {
             tag: "link".to_string(),
             args: vec![Value::String("Section".to_string())],
@@ -401,7 +401,7 @@ page Home:
             &None,
             crate::generator::RenderMode::HtmlFragment,
         );
-        assert!(!html_anch.contains("data-auig-link"));
+        assert!(!html_anch.contains("data-zoriqa-link"));
         assert!(html_anch.contains("href=\"#section\""));
     }
 
@@ -434,7 +434,7 @@ and </script> tag."#;
         let mut routes = vec![
             RouteRecord {
                 route_path: "/users/:id".to_string(),
-                file_path: PathBuf::from("pages/users/[id].aui"),
+                file_path: PathBuf::from("pages/users/[id].zq"),
                 page_name: "UserDetail".to_string(),
                 html_fragment: String::new(),
                 title: None,
@@ -442,7 +442,7 @@ and </script> tag."#;
             },
             RouteRecord {
                 route_path: "/404".to_string(),
-                file_path: PathBuf::from("pages/404.aui"),
+                file_path: PathBuf::from("pages/404.zq"),
                 page_name: "404".to_string(),
                 html_fragment: String::new(),
                 title: None,
@@ -450,7 +450,7 @@ and </script> tag."#;
             },
             RouteRecord {
                 route_path: "/users/settings".to_string(),
-                file_path: PathBuf::from("pages/users/settings.aui"),
+                file_path: PathBuf::from("pages/users/settings.zq"),
                 page_name: "UserSettings".to_string(),
                 html_fragment: String::new(),
                 title: None,
@@ -458,7 +458,7 @@ and </script> tag."#;
             },
             RouteRecord {
                 route_path: "/".to_string(),
-                file_path: PathBuf::from("pages/index.aui"),
+                file_path: PathBuf::from("pages/index.zq"),
                 page_name: "Home".to_string(),
                 html_fragment: String::new(),
                 title: None,

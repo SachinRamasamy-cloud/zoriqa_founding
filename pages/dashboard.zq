@@ -1,4 +1,4 @@
-import "components/layout.aui"
+import "components/layout.zq"
 
 page Dashboard layout Main:
   title "Dashboard"

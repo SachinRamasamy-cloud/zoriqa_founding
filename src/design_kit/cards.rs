@@ -1,15 +1,15 @@
 use super::args::{UiCall, parse_ui_call};
 use super::styles::resolve_design;
-use super::{reindent_block_lines, safe_aui_string};
+use super::{reindent_block_lines, safe_zq_string};
 
 pub fn expand_stat_card_new(call: &UiCall, indent: &str) -> Result<String, String> {
     let title = call.positional.first().map(|s| s.as_str())
         .or_else(|| call.props.get("title").map(|s| s.as_str()))
-        .ok_or_else(|| "AUIG Error: stat-card requires title (either first positional argument or title prop)".to_string())?;
+        .ok_or_else(|| "Zoriqa Error: stat-card requires title (either first positional argument or title prop)".to_string())?;
 
     let value = call.positional.get(1).map(|s| s.as_str())
         .or_else(|| call.props.get("value").map(|s| s.as_str()))
-        .ok_or_else(|| "AUIG Error: stat-card requires value (either second positional argument or value prop)".to_string())?;
+        .ok_or_else(|| "Zoriqa Error: stat-card requires value (either second positional argument or value prop)".to_string())?;
 
     let tone = call.flags.iter().find(|f| matches!(f.as_str(), "primary" | "success" | "warning" | "danger" | "info" | "dark" | "light" | "neutral")).map(|s| s.as_str());
 
@@ -42,16 +42,16 @@ pub fn expand_stat_card_new(call: &UiCall, indent: &str) -> Result<String, Strin
     output.push_str(&format!("{}card {}:\n", indent, classes.join(" ")));
 
     let text_muted = if tone == Some("dark") || design == "dark" { "opacity-80" } else { "muted" };
-    output.push_str(&format!("{}  p \"{}\" {} small\n", indent, safe_aui_string(title), text_muted));
-    output.push_str(&format!("{}  h2 \"{}\" bold\n", indent, safe_aui_string(value)));
+    output.push_str(&format!("{}  p \"{}\" {} small\n", indent, safe_zq_string(title), text_muted));
+    output.push_str(&format!("{}  h2 \"{}\" bold\n", indent, safe_zq_string(value)));
 
     if let Some(subtitle) = call.props.get("subtitle") {
-        output.push_str(&format!("{}  p \"{}\" {} small\n", indent, safe_aui_string(subtitle), text_muted));
+        output.push_str(&format!("{}  p \"{}\" {} small\n", indent, safe_zq_string(subtitle), text_muted));
     }
 
     if let Some(action) = call.props.get("action") {
         let to = call.props.get("to").map(|s| s.as_str()).unwrap_or("#");
-        output.push_str(&format!("{}  btn \"{}\" primary to \"{}\"\n", indent, safe_aui_string(action), safe_aui_string(to)));
+        output.push_str(&format!("{}  btn \"{}\" primary to \"{}\"\n", indent, safe_zq_string(action), safe_zq_string(to)));
     }
 
     if !call.children.is_empty() {
@@ -66,7 +66,7 @@ pub fn expand_stat_card_new(call: &UiCall, indent: &str) -> Result<String, Strin
 pub fn expand_feature_card(call: &UiCall, indent: &str) -> Result<String, String> {
     let title = call.positional.first().map(|s| s.as_str())
         .or_else(|| call.props.get("title").map(|s| s.as_str()))
-        .ok_or_else(|| "AUIG Error: feature-card requires title".to_string())?;
+        .ok_or_else(|| "Zoriqa Error: feature-card requires title".to_string())?;
 
     let mut desc = call.props.get("desc").map(|s| s.to_string()).unwrap_or_default();
     let mut icon = call.props.get("icon").map(|s| s.to_string()).unwrap_or_default();
@@ -125,14 +125,14 @@ pub fn expand_feature_card(call: &UiCall, indent: &str) -> Result<String, String
         let icon_bg = if tone == Some("dark") { "gray-800" } else { "blue-50" };
         let icon_text = if tone == Some("dark") { "white" } else { "blue-600" };
         output.push_str(&format!("{}    row items-center justify-center w-12 h-12 rounded-xl bg-{} text-{} bold:\n", indent, icon_bg, icon_text));
-        output.push_str(&format!("{}      p \"{}\" text-inherit\n", indent, safe_aui_string(&icon)));
+        output.push_str(&format!("{}      p \"{}\" text-inherit\n", indent, safe_zq_string(&icon)));
     }
 
-    output.push_str(&format!("{}    h2 \"{}\" bold\n", indent, safe_aui_string(title)));
+    output.push_str(&format!("{}    h2 \"{}\" bold\n", indent, safe_zq_string(title)));
 
     if !desc.is_empty() {
         let text_muted = if tone == Some("dark") { "opacity-80" } else { "muted" };
-        output.push_str(&format!("{}    p \"{}\" {} small\n", indent, safe_aui_string(&desc), text_muted));
+        output.push_str(&format!("{}    p \"{}\" {} small\n", indent, safe_zq_string(&desc), text_muted));
     }
 
     if !other_children.is_empty() {
@@ -143,7 +143,7 @@ pub fn expand_feature_card(call: &UiCall, indent: &str) -> Result<String, String
 
     if let Some(link_text) = call.props.get("link") {
         let to = call.props.get("to").map(|s| s.as_str()).unwrap_or("#");
-        output.push_str(&format!("{}    link \"{}\" to \"{}\"\n", indent, safe_aui_string(link_text), safe_aui_string(to)));
+        output.push_str(&format!("{}    link \"{}\" to \"{}\"\n", indent, safe_zq_string(link_text), safe_zq_string(to)));
     }
 
     Ok(output.trim_end().to_string())

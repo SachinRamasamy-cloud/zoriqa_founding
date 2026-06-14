@@ -23,7 +23,7 @@ pub fn generate_html_mode(program: &Program, theme: &Option<ThemeDecl>, mode: Re
             let t = p.title.clone().unwrap_or_else(|| p.name.clone());
             (t, &p.children)
         }
-        None => ("AUIG Website".to_string(), &Vec::new()),
+        None => ("Zoriqa Website".to_string(), &Vec::new()),
     };
 
     let spa_mode = mode == RenderMode::HtmlFragment;
@@ -41,7 +41,7 @@ pub fn generate_html_mode(program: &Program, theme: &Option<ThemeDecl>, mode: Re
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{}</title>
-  <link rel="stylesheet" href="/auig.css">
+  <link rel="stylesheet" href="/zoriqa.css">
 </head>
 <body>
 {}
@@ -129,7 +129,7 @@ body {
   line-height: 1.5;
 }
 
-.aui-view {
+.zq-view {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -137,7 +137,7 @@ body {
   margin: 0;
 }
 
-.aui-center {
+.zq-center {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -147,7 +147,7 @@ body {
   padding: 40px 0;
 }
 
-.aui-row {
+.zq-row {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -155,13 +155,13 @@ body {
   align-items: stretch;
 }
 
-.aui-column {
+.zq-column {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.aui-card {
+.zq-card {
   min-width: 220px;
   background: #111827;
   border: 1px solid #1f2937;
@@ -171,24 +171,24 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.aui-card:hover {
+.zq-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
 }
 
-.aui-section {
+.zq-section {
   width: min(1200px, 100%);
   margin: 0 auto;
   padding: 64px 24px;
 }
 
-.aui-heading {
+.zq-heading {
   margin: 0;
   font-weight: 700;
   letter-spacing: -0.025em;
 }
 
-.aui-h1 {
+.zq-h1 {
   font-size: 52px;
   line-height: 1.1;
   background: linear-gradient(135deg, #ffffff 0%, #9ca3af 100%);
@@ -196,18 +196,18 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-.aui-h2 {
+.zq-h2 {
   font-size: 36px;
   line-height: 1.2;
 }
 
-.aui-text {
+.zq-text {
   margin: 0;
   font-size: 16px;
   line-height: 1.7;
 }
 
-.aui-button {
+.zq-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -221,89 +221,89 @@ body {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.aui-button:hover {
+.zq-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(56, 189, 248, 0.15);
 }
 
-.aui-link {
+.zq-link {
   color: #38bdf8;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.15s ease;
 }
 
-.aui-link:hover {
+.zq-link:hover {
   color: #7dd3fc;
   text-decoration: none;
 }
 
-.aui-primary {
+.zq-primary {
   background: #38bdf8;
   color: #0f172a;
 }
 
-.aui-secondary {
+.zq-secondary {
   background: #1e293b;
   color: #f3f4f6;
   border: 1px solid #334155;
 }
 
-.aui-secondary:hover {
+.zq-secondary:hover {
   background: #334155;
 }
 
-.aui-muted {
+.zq-muted {
   color: #9ca3af;
 }
 
-.aui-large {
+.zq-large {
   font-size: 64px;
 }
 
-.aui-medium {
+.zq-medium {
   font-size: 20px;
 }
 
-.aui-small {
+.zq-small {
   font-size: 14px;
 }
 
-.aui-bold {
+.zq-bold {
   font-weight: 700;
 }
 
-.aui-gap-small {
+.zq-gap-small {
   gap: 10px;
 }
 
-.aui-gap-medium {
+.zq-gap-medium {
   gap: 20px;
 }
 
-.aui-gap-large {
+.zq-gap-large {
   gap: 40px;
 }
 
-.aui-box {
+.zq-box {
   display: block;
 }
 
-.aui-card-soft {
+.zq-card-soft {
   background: #1f2937;
   border: 1px solid #374151;
   border-radius: 18px;
   padding: 32px;
 }
 
-.aui-card-outline {
+.zq-card-outline {
   background: transparent;
   border: 2px solid #38bdf8;
   border-radius: 18px;
   padding: 32px;
 }
 
-.aui-card-dark {
+.zq-card-dark {
   background: #0b0f19;
   color: #ffffff;
   border: 1px solid #1f2937;
@@ -313,20 +313,20 @@ body {
 
 /* Responsive CSS */
 @media (max-width: 768px) {
-  .aui-row {
+  .zq-row {
     flex-direction: column;
     gap: 20px;
   }
-  .aui-section {
+  .zq-section {
     padding: 32px 16px;
   }
-  .aui-h1 {
+  .zq-h1 {
     font-size: 38px;
   }
-  .aui-h2 {
+  .zq-h2 {
     font-size: 28px;
   }
-  .aui-fixed-top {
+  .zq-fixed-top {
     position: relative;
   }
 }
@@ -334,7 +334,7 @@ body {
 
     // Theme preset resolution helper
     let resolve_color = |color: &str| -> String {
-        if let Some(ref t) = theme {
+        if let Some(t) = theme {
             if let Some(mapped) = t.variables.get(color) {
                 return mapped.clone();
             }
@@ -351,40 +351,40 @@ body {
     base_css.push_str("\n/* Dynamic Spacings */\n");
     for (name, val) in spacings {
         if used_flags.contains(&format!("p-{}", name)) {
-            base_css.push_str(&format!(".aui-p-{} {{ padding: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-p-{} {{ padding: {}; }}\n", name, val));
         }
         if used_flags.contains(&format!("px-{}", name)) {
-            base_css.push_str(&format!(".aui-px-{} {{ padding-left: {}; padding-right: {}; }}\n", name, val, val));
+            base_css.push_str(&format!(".zq-px-{} {{ padding-left: {}; padding-right: {}; }}\n", name, val, val));
         }
         if used_flags.contains(&format!("py-{}", name)) {
-            base_css.push_str(&format!(".aui-py-{} {{ padding-top: {}; padding-bottom: {}; }}\n", name, val, val));
+            base_css.push_str(&format!(".zq-py-{} {{ padding-top: {}; padding-bottom: {}; }}\n", name, val, val));
         }
         if used_flags.contains(&format!("m-{}", name)) {
-            base_css.push_str(&format!(".aui-m-{} {{ margin: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-m-{} {{ margin: {}; }}\n", name, val));
         }
         if used_flags.contains(&format!("mx-{}", name)) {
-            base_css.push_str(&format!(".aui-mx-{} {{ margin-left: {}; margin-right: {}; }}\n", name, val, val));
+            base_css.push_str(&format!(".zq-mx-{} {{ margin-left: {}; margin-right: {}; }}\n", name, val, val));
         }
         if used_flags.contains(&format!("my-{}", name)) {
-            base_css.push_str(&format!(".aui-my-{} {{ margin-top: {}; margin-bottom: {}; }}\n", name, val, val));
+            base_css.push_str(&format!(".zq-my-{} {{ margin-top: {}; margin-bottom: {}; }}\n", name, val, val));
         }
         if used_flags.contains(&format!("mt-{}", name)) {
-            base_css.push_str(&format!(".aui-mt-{} {{ margin-top: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-mt-{} {{ margin-top: {}; }}\n", name, val));
         }
         if used_flags.contains(&format!("mb-{}", name)) {
-            base_css.push_str(&format!(".aui-mb-{} {{ margin-bottom: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-mb-{} {{ margin-bottom: {}; }}\n", name, val));
         }
         if used_flags.contains(&format!("ml-{}", name)) {
-            base_css.push_str(&format!(".aui-ml-{} {{ margin-left: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-ml-{} {{ margin-left: {}; }}\n", name, val));
         }
         if used_flags.contains(&format!("mr-{}", name)) {
-            base_css.push_str(&format!(".aui-mr-{} {{ margin-right: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-mr-{} {{ margin-right: {}; }}\n", name, val));
         }
         if used_flags.contains(&format!("pt-{}", name)) {
-            base_css.push_str(&format!(".aui-pt-{} {{ padding-top: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-pt-{} {{ padding-top: {}; }}\n", name, val));
         }
         if used_flags.contains(&format!("pb-{}", name)) {
-            base_css.push_str(&format!(".aui-pb-{} {{ padding-bottom: {}; }}\n", name, val));
+            base_css.push_str(&format!(".zq-pb-{} {{ padding-bottom: {}; }}\n", name, val));
         }
     }
 
@@ -430,14 +430,14 @@ body {
     let color_map_hash: HashMap<&str, Vec<(&str, &str)>> = color_maps.into_iter().collect();
 
     base_css.push_str("\n/* Dynamic Colors */\n");
-    if used_flags.contains("bg-white") { base_css.push_str(".aui-bg-white { background-color: #ffffff; }\n"); }
-    if used_flags.contains("text-white") { base_css.push_str(".aui-text-white { color: #ffffff; }\n"); }
-    if used_flags.contains("border-white") { base_css.push_str(".aui-border-white { border-color: #ffffff; }\n"); }
-    if used_flags.contains("bg-black") { base_css.push_str(".aui-bg-black { background-color: #000000; }\n"); }
-    if used_flags.contains("text-black") { base_css.push_str(".aui-text-black { color: #000000; }\n"); }
-    if used_flags.contains("border-black") { base_css.push_str(".aui-border-black { border-color: #000000; }\n"); }
-    if used_flags.contains("bg-transparent") { base_css.push_str(".aui-bg-transparent { background-color: transparent; }\n"); }
-    if used_flags.contains("text-inherit") { base_css.push_str(".aui-text-inherit { color: inherit; }\n"); }
+    if used_flags.contains("bg-white") { base_css.push_str(".zq-bg-white { background-color: #ffffff; }\n"); }
+    if used_flags.contains("text-white") { base_css.push_str(".zq-text-white { color: #ffffff; }\n"); }
+    if used_flags.contains("border-white") { base_css.push_str(".zq-border-white { border-color: #ffffff; }\n"); }
+    if used_flags.contains("bg-black") { base_css.push_str(".zq-bg-black { background-color: #000000; }\n"); }
+    if used_flags.contains("text-black") { base_css.push_str(".zq-text-black { color: #000000; }\n"); }
+    if used_flags.contains("border-black") { base_css.push_str(".zq-border-black { border-color: #000000; }\n"); }
+    if used_flags.contains("bg-transparent") { base_css.push_str(".zq-bg-transparent { background-color: transparent; }\n"); }
+    if used_flags.contains("text-inherit") { base_css.push_str(".zq-text-inherit { color: inherit; }\n"); }
 
     for flag in used_flags {
         // Parse flag e.g. "bg-primary-50" or "bg-blue-600"
@@ -455,66 +455,66 @@ body {
                         "text" => "color",
                         _ => "border-color",
                     };
-                    base_css.push_str(&format!(".aui-{} {{ {}: {}; }}\n", flag, prop, hex));
+                    base_css.push_str(&format!(".zq-{} {{ {}: {}; }}\n", flag, prop, hex));
                 }
             }
         }
     }
 
     base_css.push_str("\n/* Layout Modifiers */\n");
-    if used_flags.contains("rounded-sm") { base_css.push_str(".aui-rounded-sm { border-radius: 4px; }\n"); }
-    if used_flags.contains("rounded-md") { base_css.push_str(".aui-rounded-md { border-radius: 8px; }\n"); }
-    if used_flags.contains("rounded-lg") { base_css.push_str(".aui-rounded-lg { border-radius: 12px; }\n"); }
-    if used_flags.contains("rounded-xl") { base_css.push_str(".aui-rounded-xl { border-radius: 16px; }\n"); }
-    if used_flags.contains("rounded-2xl") { base_css.push_str(".aui-rounded-2xl { border-radius: 20px; }\n"); }
-    if used_flags.contains("rounded-full") { base_css.push_str(".aui-rounded-full { border-radius: 9999px; }\n"); }
+    if used_flags.contains("rounded-sm") { base_css.push_str(".zq-rounded-sm { border-radius: 4px; }\n"); }
+    if used_flags.contains("rounded-md") { base_css.push_str(".zq-rounded-md { border-radius: 8px; }\n"); }
+    if used_flags.contains("rounded-lg") { base_css.push_str(".zq-rounded-lg { border-radius: 12px; }\n"); }
+    if used_flags.contains("rounded-xl") { base_css.push_str(".zq-rounded-xl { border-radius: 16px; }\n"); }
+    if used_flags.contains("rounded-2xl") { base_css.push_str(".zq-rounded-2xl { border-radius: 20px; }\n"); }
+    if used_flags.contains("rounded-full") { base_css.push_str(".zq-rounded-full { border-radius: 9999px; }\n"); }
 
-    if used_flags.contains("items-center") { base_css.push_str(".aui-items-center { align-items: center; }\n"); }
-    if used_flags.contains("items-start") { base_css.push_str(".aui-items-start { align-items: flex-start; }\n"); }
-    if used_flags.contains("items-end") { base_css.push_str(".aui-items-end { align-items: flex-end; }\n"); }
-    if used_flags.contains("items-baseline") { base_css.push_str(".aui-items-baseline { align-items: baseline; }\n"); }
-    if used_flags.contains("items-stretch") { base_css.push_str(".aui-items-stretch { align-items: stretch; }\n"); }
-    if used_flags.contains("justify-between") { base_css.push_str(".aui-justify-between { justify-content: space-between; }\n"); }
-    if used_flags.contains("justify-center") { base_css.push_str(".aui-justify-center { justify-content: center; }\n"); }
-    if used_flags.contains("justify-start") { base_css.push_str(".aui-justify-start { justify-content: flex-start; }\n"); }
-    if used_flags.contains("justify-end") { base_css.push_str(".aui-justify-end { justify-content: flex-end; }\n"); }
-    if used_flags.contains("flex-row") { base_css.push_str(".aui-flex-row { flex-direction: row; }\n"); }
-    if used_flags.contains("flex-col") { base_css.push_str(".aui-flex-col { flex-direction: column; }\n"); }
-    if used_flags.contains("inline-block") { base_css.push_str(".aui-inline-block { display: inline-block; }\n"); }
-    if used_flags.contains("flex") { base_css.push_str(".aui-flex { display: flex; }\n"); }
+    if used_flags.contains("items-center") { base_css.push_str(".zq-items-center { align-items: center; }\n"); }
+    if used_flags.contains("items-start") { base_css.push_str(".zq-items-start { align-items: flex-start; }\n"); }
+    if used_flags.contains("items-end") { base_css.push_str(".zq-items-end { align-items: flex-end; }\n"); }
+    if used_flags.contains("items-baseline") { base_css.push_str(".zq-items-baseline { align-items: baseline; }\n"); }
+    if used_flags.contains("items-stretch") { base_css.push_str(".zq-items-stretch { align-items: stretch; }\n"); }
+    if used_flags.contains("justify-between") { base_css.push_str(".zq-justify-between { justify-content: space-between; }\n"); }
+    if used_flags.contains("justify-center") { base_css.push_str(".zq-justify-center { justify-content: center; }\n"); }
+    if used_flags.contains("justify-start") { base_css.push_str(".zq-justify-start { justify-content: flex-start; }\n"); }
+    if used_flags.contains("justify-end") { base_css.push_str(".zq-justify-end { justify-content: flex-end; }\n"); }
+    if used_flags.contains("flex-row") { base_css.push_str(".zq-flex-row { flex-direction: row; }\n"); }
+    if used_flags.contains("flex-col") { base_css.push_str(".zq-flex-col { flex-direction: column; }\n"); }
+    if used_flags.contains("inline-block") { base_css.push_str(".zq-inline-block { display: inline-block; }\n"); }
+    if used_flags.contains("flex") { base_css.push_str(".zq-flex { display: flex; }\n"); }
     
-    if used_flags.contains("w-full") { base_css.push_str(".aui-w-full { width: 100%; }\n"); }
-    if used_flags.contains("w-auto") { base_css.push_str(".aui-w-auto { width: auto; }\n"); }
-    if used_flags.contains("h-full") { base_css.push_str(".aui-h-full { height: 100%; }\n"); }
-    if used_flags.contains("h-auto") { base_css.push_str(".aui-h-auto { height: auto; }\n"); }
-    if used_flags.contains("w-12") { base_css.push_str(".aui-w-12 { width: 48px; }\n"); }
-    if used_flags.contains("h-12") { base_css.push_str(".aui-h-12 { height: 48px; }\n"); }
+    if used_flags.contains("w-full") { base_css.push_str(".zq-w-full { width: 100%; }\n"); }
+    if used_flags.contains("w-auto") { base_css.push_str(".zq-w-auto { width: auto; }\n"); }
+    if used_flags.contains("h-full") { base_css.push_str(".zq-h-full { height: 100%; }\n"); }
+    if used_flags.contains("h-auto") { base_css.push_str(".zq-h-auto { height: auto; }\n"); }
+    if used_flags.contains("w-12") { base_css.push_str(".zq-w-12 { width: 48px; }\n"); }
+    if used_flags.contains("h-12") { base_css.push_str(".zq-h-12 { height: 48px; }\n"); }
     
-    if used_flags.contains("border") { base_css.push_str(".aui-border { border-style: solid; border-width: 1px; }\n"); }
-    if used_flags.contains("border-2") { base_css.push_str(".aui-border-2 { border-style: solid; border-width: 2px; }\n"); }
-    if used_flags.contains("border-t") { base_css.push_str(".aui-border-t { border-top-style: solid; border-top-width: 1px; }\n"); }
-    if used_flags.contains("border-b") { base_css.push_str(".aui-border-b { border-bottom-style: solid; border-bottom-width: 1px; }\n"); }
+    if used_flags.contains("border") { base_css.push_str(".zq-border { border-style: solid; border-width: 1px; }\n"); }
+    if used_flags.contains("border-2") { base_css.push_str(".zq-border-2 { border-style: solid; border-width: 2px; }\n"); }
+    if used_flags.contains("border-t") { base_css.push_str(".zq-border-t { border-top-style: solid; border-top-width: 1px; }\n"); }
+    if used_flags.contains("border-b") { base_css.push_str(".zq-border-b { border-bottom-style: solid; border-bottom-width: 1px; }\n"); }
     
-    if used_flags.contains("shadow-sm") { base_css.push_str(".aui-shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }\n"); }
-    if used_flags.contains("shadow-md") { base_css.push_str(".aui-shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }\n"); }
-    if used_flags.contains("shadow-lg") { base_css.push_str(".aui-shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }\n"); }
-    if used_flags.contains("scale-105") { base_css.push_str(".aui-scale-105 { transform: scale(1.05); }\n"); }
-    if used_flags.contains("relative") { base_css.push_str(".aui-relative { position: relative; }\n"); }
-    if used_flags.contains("opacity-80") { base_css.push_str(".aui-opacity-80 { opacity: 0.8; }\n"); }
-    if used_flags.contains("opacity-90") { base_css.push_str(".aui-opacity-90 { opacity: 0.9; }\n"); }
-    if used_flags.contains("text-xs") { base_css.push_str(".aui-text-xs { font-size: 12px; }\n"); }
-    if used_flags.contains("fixed-top") { base_css.push_str(".aui-fixed-top { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }\n"); }
-    if used_flags.contains("text-center") { base_css.push_str(".aui-text-center { text-align: center; }\n"); }
-    if used_flags.contains("text-left") { base_css.push_str(".aui-text-left { text-align: left; }\n"); }
-    if used_flags.contains("text-right") { base_css.push_str(".aui-text-right { text-align: right; }\n"); }
-    if used_flags.contains("w-64") { base_css.push_str(".aui-w-64 { width: 256px; }\n"); }
-    if used_flags.contains("max-w-lg") { base_css.push_str(".aui-max-w-lg { max-width: 512px; }\n"); }
-    if used_flags.contains("mx-auto") { base_css.push_str(".aui-mx-auto { margin-left: auto; margin-right: auto; }\n"); }
-    if used_flags.contains("grid") { base_css.push_str(".aui-grid { display: grid; }\n"); }
-    if used_flags.contains("grid-cols-3") { base_css.push_str(".aui-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }\n"); }
-    if used_flags.contains("border-l") { base_css.push_str(".aui-border-l { border-left-style: solid; border-left-width: 1px; }\n"); }
-    if used_flags.contains("italic") { base_css.push_str(".aui-italic { font-style: italic; }\n"); }
-    if used_flags.contains("shadow-xl") { base_css.push_str(".aui-shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }\n"); }
+    if used_flags.contains("shadow-sm") { base_css.push_str(".zq-shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }\n"); }
+    if used_flags.contains("shadow-md") { base_css.push_str(".zq-shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }\n"); }
+    if used_flags.contains("shadow-lg") { base_css.push_str(".zq-shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }\n"); }
+    if used_flags.contains("scale-105") { base_css.push_str(".zq-scale-105 { transform: scale(1.05); }\n"); }
+    if used_flags.contains("relative") { base_css.push_str(".zq-relative { position: relative; }\n"); }
+    if used_flags.contains("opacity-80") { base_css.push_str(".zq-opacity-80 { opacity: 0.8; }\n"); }
+    if used_flags.contains("opacity-90") { base_css.push_str(".zq-opacity-90 { opacity: 0.9; }\n"); }
+    if used_flags.contains("text-xs") { base_css.push_str(".zq-text-xs { font-size: 12px; }\n"); }
+    if used_flags.contains("fixed-top") { base_css.push_str(".zq-fixed-top { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }\n"); }
+    if used_flags.contains("text-center") { base_css.push_str(".zq-text-center { text-align: center; }\n"); }
+    if used_flags.contains("text-left") { base_css.push_str(".zq-text-left { text-align: left; }\n"); }
+    if used_flags.contains("text-right") { base_css.push_str(".zq-text-right { text-align: right; }\n"); }
+    if used_flags.contains("w-64") { base_css.push_str(".zq-w-64 { width: 256px; }\n"); }
+    if used_flags.contains("max-w-lg") { base_css.push_str(".zq-max-w-lg { max-width: 512px; }\n"); }
+    if used_flags.contains("mx-auto") { base_css.push_str(".zq-mx-auto { margin-left: auto; margin-right: auto; }\n"); }
+    if used_flags.contains("grid") { base_css.push_str(".zq-grid { display: grid; }\n"); }
+    if used_flags.contains("grid-cols-3") { base_css.push_str(".zq-grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }\n"); }
+    if used_flags.contains("border-l") { base_css.push_str(".zq-border-l { border-left-style: solid; border-left-width: 1px; }\n"); }
+    if used_flags.contains("italic") { base_css.push_str(".zq-italic { font-style: italic; }\n"); }
+    if used_flags.contains("shadow-xl") { base_css.push_str(".zq-shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }\n"); }
 
     base_css
 }
@@ -585,40 +585,40 @@ fn class_name(node: &ElementNode) -> String {
     let mut classes = Vec::new();
 
     match node.tag.as_str() {
-        "view" => classes.push("aui-view".to_string()),
+        "view" => classes.push("zq-view".to_string()),
         "h1" | "heading" => {
-            classes.push("aui-heading".to_string());
-            classes.push("aui-h1".to_string());
+            classes.push("zq-heading".to_string());
+            classes.push("zq-h1".to_string());
         }
         "h2" => {
-            classes.push("aui-heading".to_string());
-            classes.push("aui-h2".to_string());
+            classes.push("zq-heading".to_string());
+            classes.push("zq-h2".to_string());
         }
         "h3" => {
-            classes.push("aui-heading".to_string());
-            classes.push("aui-h3".to_string());
+            classes.push("zq-heading".to_string());
+            classes.push("zq-h3".to_string());
         }
-        "p" | "text" | "subtitle" | "desc" | "message" => classes.push("aui-text".to_string()),
-        "icon" | "span" => classes.push(format!("aui-{}", node.tag)),
-        "btn" | "button" | "action" => classes.push("aui-button".to_string()),
-        "link" | "a" => classes.push("aui-link".to_string()),
-        "row" => classes.push("aui-row".to_string()),
-        "column" | "col" => classes.push("aui-column".to_string()),
-        "center" => classes.push("aui-center".to_string()),
-        "card" => classes.push("aui-card".to_string()),
-        "section" => classes.push("aui-section".to_string()),
-        "nav" => classes.push("aui-navbar".to_string()),
-        "footer" => classes.push("aui-footer".to_string()),
-        "aside" => classes.push("aui-aside".to_string()),
-        "dialog" => classes.push("aui-dialog".to_string()),
-        "ol" => classes.push("aui-ol".to_string()),
-        "figure" => classes.push("aui-figure".to_string()),
-        _ => classes.push("aui-box".to_string()),
+        "p" | "text" | "subtitle" | "desc" | "message" => classes.push("zq-text".to_string()),
+        "icon" | "span" => classes.push(format!("zq-{}", node.tag)),
+        "btn" | "button" | "action" => classes.push("zq-button".to_string()),
+        "link" | "a" => classes.push("zq-link".to_string()),
+        "row" => classes.push("zq-row".to_string()),
+        "column" | "col" => classes.push("zq-column".to_string()),
+        "center" => classes.push("zq-center".to_string()),
+        "card" => classes.push("zq-card".to_string()),
+        "section" => classes.push("zq-section".to_string()),
+        "nav" => classes.push("zq-navbar".to_string()),
+        "footer" => classes.push("zq-footer".to_string()),
+        "aside" => classes.push("zq-aside".to_string()),
+        "dialog" => classes.push("zq-dialog".to_string()),
+        "ol" => classes.push("zq-ol".to_string()),
+        "figure" => classes.push("zq-figure".to_string()),
+        _ => classes.push("zq-box".to_string()),
     }
 
     for flag in &node.flags {
         for part in flag.split_whitespace() {
-            classes.push(format!("aui-{}", part));
+            classes.push(format!("zq-{}", part));
         }
     }
 
@@ -651,7 +651,7 @@ fn html_attrs(node: &ElementNode, spa_mode: bool) -> String {
         attrs.push_str(&format!(" {}=\"{}\"", escape_html(attr_name), escape_html(val.as_str())));
     }
     if spa_mode && has_to && is_local_to && matches!(node.tag.as_str(), "link" | "a" | "btn" | "button" | "action") {
-        attrs.push_str(" data-auig-link");
+        attrs.push_str(" data-zoriqa-link");
     }
     attrs
 }
@@ -665,7 +665,7 @@ pub fn validate_and_collect_jit_css(
         if !is_valid_utility(flag) {
             let suggestion = find_closest_utility(flag);
             return Err(format!(
-                "AUIG Error:\n\nUnknown utility:\n{}\n\nDid you mean:\n{}\n\n(in {})",
+                "Zoriqa Error:\n\nUnknown utility:\n{}\n\nDid you mean:\n{}\n\n(in {})",
                 flag, suggestion, file_name
             ));
         }

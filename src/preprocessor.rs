@@ -12,7 +12,7 @@ pub fn compile_file(
     active_kits: &mut Vec<String>,
 ) -> Result<Program, String> {
     let source = fs::read_to_string(input_file)
-        .map_err(|_| format!("AUIG Error: could not read file '{}'", input_file))?;
+        .map_err(|_| format!("Zoriqa Error: could not read file '{}'", input_file))?;
 
     let tokens = lex(&source).map_err(|e| {
         format!("{} (in {})", e, input_file)
@@ -28,8 +28,8 @@ pub fn compile_file(
     // Collect imports and components from the program
     for decl in &program.declarations {
         match decl {
-            TopLevel::Import(ref path) => {
-                if path.starts_with("auig/") {
+            TopLevel::Import(path) => {
+                if path.starts_with("zoriqa/") {
                     active_kits.push(path.clone());
                 } else {
                     let resolved = resolve_import_path(path, input_file)?;
@@ -78,7 +78,7 @@ fn resolve_import_path(import_path: &str, input_file: &str) -> Result<PathBuf, S
     }
 
     Err(format!(
-        "AUIG Error: imported file '{}' was not found relative to '{}'",
+        "Zoriqa Error: imported file '{}' was not found relative to '{}'",
         import_path, input_file
     ))
 }

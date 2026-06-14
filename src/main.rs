@@ -85,13 +85,13 @@ fn build_project(input_file: &str, out_dir: &str) -> Result<(), String> {
 
     let out_path = PathBuf::from(out_dir);
     fs::create_dir_all(&out_path)
-        .map_err(|_| "AUIG Error: could not create output folder".to_string())?;
+        .map_err(|_| "Zoriqa Error: could not create output folder".to_string())?;
 
     fs::write(out_path.join("index.html"), html)
-        .map_err(|_| "AUIG Error: could not write index.html".to_string())?;
+        .map_err(|_| "Zoriqa Error: could not write index.html".to_string())?;
 
-    fs::write(out_path.join("auig.css"), css)
-        .map_err(|_| "AUIG Error: could not write auig.css".to_string())?;
+    fs::write(out_path.join("zoriqa.css"), css)
+        .map_err(|_| "Zoriqa Error: could not write zoriqa.css".to_string())?;
 
     Ok(())
 }
@@ -102,19 +102,19 @@ fn build_pages(pages_dir: &str, out_dir: &str, mode: BuildMode) -> Result<(), St
 
     if !pages_path.exists() {
         return Err(format!(
-            "AUIG Error: pages folder '{}' does not exist",
+            "Zoriqa Error: pages folder '{}' does not exist",
             pages_dir
         ));
     }
 
     fs::create_dir_all(&out_path)
-        .map_err(|_| "AUIG Error: could not create output folder".to_string())?;
+        .map_err(|_| "Zoriqa Error: could not create output folder".to_string())?;
 
-    let page_files = collect_aui_files(&pages_path)?;
+    let page_files = collect_zq_files(&pages_path)?;
 
     if page_files.is_empty() {
         return Err(format!(
-            "AUIG Error: no .aui files found in '{}'",
+            "Zoriqa Error: no .zq files found in '{}'",
             pages_dir
         ));
     }
@@ -132,7 +132,7 @@ fn build_pages(pages_dir: &str, out_dir: &str, mode: BuildMode) -> Result<(), St
     for page_file in &page_files {
         let input_file = page_file
             .to_str()
-            .ok_or_else(|| "AUIG Error: invalid page path".to_string())?;
+            .ok_or_else(|| "Zoriqa Error: invalid page path".to_string())?;
 
         let program = preprocessor::compile_file(input_file, &mut user_components, &mut active_kits)?;
         if global_theme.is_none() {
@@ -204,27 +204,27 @@ fn build_pages(pages_dir: &str, out_dir: &str, mode: BuildMode) -> Result<(), St
             for (output_file, html) in pages_data {
                 if let Some(parent) = output_file.parent() {
                     fs::create_dir_all(parent)
-                        .map_err(|_| "AUIG Error: could not create route folder".to_string())?;
+                        .map_err(|_| "Zoriqa Error: could not create route folder".to_string())?;
                 }
 
                 fs::write(&output_file, html)
-                    .map_err(|_| format!("AUIG Error: could not write '{}'", output_file.display()))?;
+                    .map_err(|_| format!("Zoriqa Error: could not write '{}'", output_file.display()))?;
 
                 println!("Route generated: {}", output_file.display());
             }
         }
         BuildMode::Spa => {
-            // Check if pages/404.aui is missing, if so, generate default 404
+            // Check if pages/404.zq is missing, if so, generate default 404
             let has_404 = routes.iter().any(|r| r.route_path == "/404");
             if !has_404 {
-                let default_404_html = r#"<main class="aui-center">
-  <h1 class="aui-heading aui-h1 aui-bold aui-large">404</h1>
-  <p class="aui-text">Page not found</p>
+                let default_404_html = r#"<main class="zq-center">
+  <h1 class="zq-heading zq-h1 zq-bold zq-large">404</h1>
+  <p class="zq-text">Page not found</p>
 </main>
 "#.to_string();
                 routes.push(router::RouteRecord {
                     route_path: "/404".to_string(),
-                    file_path: PathBuf::from("pages/404.aui"),
+                    file_path: PathBuf::from("pages/404.zq"),
                     page_name: "404".to_string(),
                     html_fragment: default_404_html,
                     title: Some("404 Not Found".to_string()),
@@ -261,16 +261,16 @@ fn build_pages(pages_dir: &str, out_dir: &str, mode: BuildMode) -> Result<(), St
                 .iter()
                 .find(|r| r.route_path == "/")
                 .and_then(|r| r.title.clone())
-                .unwrap_or_else(|| "AUIG App".to_string());
+                .unwrap_or_else(|| "Zoriqa App".to_string());
 
             let index_html = spa::generate_spa_index(&index_title);
             let app_js = spa::generate_spa_runtime(&routes);
 
             fs::write(out_path.join("index.html"), index_html)
-                .map_err(|_| "AUIG Error: could not write SPA index.html".to_string())?;
+                .map_err(|_| "Zoriqa Error: could not write SPA index.html".to_string())?;
 
             fs::write(out_path.join("app.js"), app_js)
-                .map_err(|_| "AUIG Error: could not write SPA app.js".to_string())?;
+                .map_err(|_| "Zoriqa Error: could not write SPA app.js".to_string())?;
 
             println!("SPA routes compiled: {}", routes.len());
             println!("Route generated: {}", out_path.join("index.html").display());
@@ -279,8 +279,8 @@ fn build_pages(pages_dir: &str, out_dir: &str, mode: BuildMode) -> Result<(), St
     }
 
     let css = generator::generate_css(&used_flags, &global_theme);
-    fs::write(out_path.join("auig.css"), css)
-        .map_err(|_| "AUIG Error: could not write auig.css".to_string())?;
+    fs::write(out_path.join("zoriqa.css"), css)
+        .map_err(|_| "Zoriqa Error: could not write zoriqa.css".to_string())?;
 
     Ok(())
 }
@@ -290,16 +290,16 @@ fn check_pages(pages_dir: &str) -> Result<(), String> {
 
     if !pages_path.exists() {
         return Err(format!(
-            "AUIG Error: pages folder '{}' does not exist",
+            "Zoriqa Error: pages folder '{}' does not exist",
             pages_dir
         ));
     }
 
-    let page_files = collect_aui_files(&pages_path)?;
+    let page_files = collect_zq_files(&pages_path)?;
 
     if page_files.is_empty() {
         return Err(format!(
-            "AUIG Error: no .aui files found in '{}'",
+            "Zoriqa Error: no .zq files found in '{}'",
             pages_dir
         ));
     }
@@ -310,7 +310,7 @@ fn check_pages(pages_dir: &str) -> Result<(), String> {
     for page_file in page_files {
         let input_file = page_file
             .to_str()
-            .ok_or_else(|| "AUIG Error: invalid page path".to_string())?;
+            .ok_or_else(|| "Zoriqa Error: invalid page path".to_string())?;
 
         let mut program = preprocessor::compile_file(input_file, &mut user_components, &mut active_kits)?;
         layout::apply_layouts(&mut program, input_file)?;
@@ -337,19 +337,21 @@ fn check_pages(pages_dir: &str) -> Result<(), String> {
     Ok(())
 }
 
-fn collect_aui_files(dir: &Path) -> Result<Vec<PathBuf>, String> {
+fn collect_zq_files(dir: &Path) -> Result<Vec<PathBuf>, String> {
     let mut files = Vec::new();
 
     for entry in fs::read_dir(dir)
-        .map_err(|_| format!("AUIG Error: could not read folder '{}'", dir.display()))?
+        .map_err(|_| format!("Zoriqa Error: could not read folder '{}'", dir.display()))?
     {
-        let entry = entry.map_err(|_| "AUIG Error: could not read folder entry".to_string())?;
+        let entry = entry.map_err(|_| "Zoriqa Error: could not read folder entry".to_string())?;
         let path = entry.path();
 
         if path.is_dir() {
-            files.extend(collect_aui_files(&path)?);
-        } else if path.extension().and_then(|ext| ext.to_str()) == Some("aui") {
-            files.push(path);
+            files.extend(collect_zq_files(&path)?);
+        } else if let Some(ext) = path.extension().and_then(|ext| ext.to_str()) {
+            if ext == "zq" || ext == "aui" {
+                files.push(path);
+            }
         }
     }
 
@@ -364,7 +366,7 @@ fn route_output_path(
 ) -> Result<PathBuf, String> {
     let relative = page_file
         .strip_prefix(pages_dir)
-        .map_err(|_| "AUIG Error: invalid page path".to_string())?;
+        .map_err(|_| "Zoriqa Error: invalid page path".to_string())?;
 
     let route = relative.with_extension("");
 
@@ -377,17 +379,17 @@ fn route_output_path(
 
 fn latest_modified_time(path: &Path) -> Result<SystemTime, String> {
     let metadata = fs::metadata(path)
-        .map_err(|_| format!("AUIG Error: could not read '{}'", path.display()))?;
+        .map_err(|_| format!("Zoriqa Error: could not read '{}'", path.display()))?;
 
     let mut latest = metadata
         .modified()
-        .map_err(|_| format!("AUIG Error: could not read modified time for '{}'", path.display()))?;
+        .map_err(|_| format!("Zoriqa Error: could not read modified time for '{}'", path.display()))?;
 
     if path.is_dir() {
         for entry in fs::read_dir(path)
-            .map_err(|_| format!("AUIG Error: could not read folder '{}'", path.display()))?
+            .map_err(|_| format!("Zoriqa Error: could not read folder '{}'", path.display()))?
         {
-            let entry = entry.map_err(|_| "AUIG Error: could not read folder entry".to_string())?;
+            let entry = entry.map_err(|_| "Zoriqa Error: could not read folder entry".to_string())?;
             let child_path = entry.path();
 
             let child_latest = latest_modified_time(&child_path)?;
@@ -423,22 +425,22 @@ fn build_command(args: &[String]) -> Result<(), String> {
 
     if let Some(pages_dir) = parse_pages_dir(args) {
         build_pages(&pages_dir, &out_dir, mode)?;
-        println!("AUIG pages build complete.");
+        println!("Zoriqa pages build complete.");
         println!("Generated routes in: {}", out_dir);
         return Ok(());
     }
 
     if args.len() < 3 {
-        return Err("AUIG Error: missing input file".to_string());
+        return Err("Zoriqa Error: missing input file".to_string());
     }
 
     let input_file = &args[2];
 
     build_project(input_file, &out_dir)?;
 
-    println!("AUIG build complete.");
+    println!("Zoriqa build complete.");
     println!("Generated: {}/index.html", out_dir);
-    println!("Generated: {}/auig.css", out_dir);
+    println!("Generated: {}/zoriqa.css", out_dir);
 
     Ok(())
 }
@@ -450,7 +452,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
     let mode = parse_mode(args);
     let input_file = if pages_dir.is_none() {
         if args.len() < 3 {
-            return Err("AUIG Error: missing input file".to_string());
+            return Err("Zoriqa Error: missing input file".to_string());
         }
 
         Some(args[2].clone())
@@ -480,9 +482,9 @@ fn dev_command(args: &[String]) -> Result<(), String> {
 
     let address = format!("127.0.0.1:{}", port);
     let listener = TcpListener::bind(&address)
-        .map_err(|_| format!("AUIG Error: could not start server at {}", address))?;
+        .map_err(|_| format!("Zoriqa Error: could not start server at {}", address))?;
 
-    println!("AUIG dev server running.");
+    println!("Zoriqa dev server running.");
     if let Some(pages_dir_value) = &pages_dir {
         println!("Pages: {}", pages_dir_value);
     } else if let Some(input_file_value) = &input_file {
@@ -491,7 +493,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
     println!("Output: {}", out_dir);
     println!("Open: http://{}", address);
     println!();
-    println!("After changing .aui file, refresh the browser.");
+    println!("After changing .zq file, refresh the browser.");
 
     for stream in listener.incoming() {
         match stream {
@@ -510,7 +512,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
                             }
 
                             last_build_time = latest_time;
-                            println!("AUIG rebuilt.");
+                            println!("Zoriqa rebuilt.");
                         }
                     }
                     Err(error) => {
@@ -523,7 +525,7 @@ fn dev_command(args: &[String]) -> Result<(), String> {
                 }
             }
             Err(_) => {
-                eprintln!("AUIG Error: failed to read browser request");
+                eprintln!("Zoriqa Error: failed to read browser request");
             }
         }
     }
@@ -536,7 +538,7 @@ fn handle_request(mut stream: TcpStream, out_dir: &str, mode: BuildMode) -> Resu
 
     stream
         .read(&mut buffer)
-        .map_err(|_| "AUIG Error: could not read request".to_string())?;
+        .map_err(|_| "Zoriqa Error: could not read request".to_string())?;
 
     let request = String::from_utf8_lossy(&buffer);
     let path = get_request_path(&request);
@@ -576,7 +578,7 @@ fn handle_request(mut stream: TcpStream, out_dir: &str, mode: BuildMode) -> Resu
 
     if file_path.exists() {
         let content = fs::read(&file_path)
-            .map_err(|_| "AUIG Error: could not read output file".to_string())?;
+            .map_err(|_| "Zoriqa Error: could not read output file".to_string())?;
 
         let content_type = get_content_type(&file_path);
 
@@ -617,11 +619,11 @@ fn send_response(
 
     stream
         .write_all(header.as_bytes())
-        .map_err(|_| "AUIG Error: could not send response header".to_string())?;
+        .map_err(|_| "Zoriqa Error: could not send response header".to_string())?;
 
     stream
         .write_all(body)
-        .map_err(|_| "AUIG Error: could not send response body".to_string())?;
+        .map_err(|_| "Zoriqa Error: could not send response body".to_string())?;
 
     Ok(())
 }
@@ -700,13 +702,13 @@ fn parse_pages_dir(args: &[String]) -> Option<String> {
 
 fn tokens_command(args: &[String]) -> Result<(), String> {
     if args.len() < 3 {
-        return Err("AUIG Error: missing input file".to_string());
+        return Err("Zoriqa Error: missing input file".to_string());
     }
 
 
 
     let source = fs::read_to_string(&args[2])
-        .map_err(|_| format!("AUIG Error: could not read file '{}'", args[2]))?;
+        .map_err(|_| format!("Zoriqa Error: could not read file '{}'", args[2]))?;
 
     let tokens = lexer::lex(&source)?;
 
@@ -719,7 +721,7 @@ fn tokens_command(args: &[String]) -> Result<(), String> {
 
 fn ast_command(args: &[String]) -> Result<(), String> {
     if args.len() < 3 {
-        return Err("AUIG Error: missing input file".to_string());
+        return Err("Zoriqa Error: missing input file".to_string());
     }
 
     let mut user_components = std::collections::HashMap::new();
@@ -735,12 +737,12 @@ fn ast_command(args: &[String]) -> Result<(), String> {
 fn check_command(args: &[String]) -> Result<(), String> {
     if let Some(pages_dir) = parse_pages_dir(args) {
         check_pages(&pages_dir)?;
-        println!("AUIG pages check passed.");
+        println!("Zoriqa pages check passed.");
         return Ok(());
     }
 
     if args.len() < 3 {
-        return Err("AUIG Error: missing input file".to_string());
+        return Err("Zoriqa Error: missing input file".to_string());
     }
 
     let mut user_components = std::collections::HashMap::new();
@@ -765,23 +767,23 @@ fn check_command(args: &[String]) -> Result<(), String> {
     generator::collect_program_flags(&program, &mut used_flags);
     generator::validate_and_collect_jit_css(&used_flags, &args[2])?;
 
-    println!("AUIG check passed.");
+    println!("Zoriqa check passed.");
 
     Ok(())
 }
 
 fn print_help() {
-    println!("AUIG v1.0");
+    println!("Zoriqa v1.0");
     println!();
     println!("Commands:");
-    println!("  auig build <file.aui> --out <folder>");
-    println!("  auig build --pages <folder> --out <folder>");
-    println!("  auig dev <file.aui> --out <folder> --port <port>");
-    println!("  auig dev --pages <folder> --out <folder> --port <port>");
-    println!("  auig check <file.aui>");
-    println!("  auig check --pages <folder>");
-    println!("  auig tokens <file.aui>");
-    println!("  auig ast <file.aui>");
+    println!("  zoriqa build <file.zq> --out <folder>");
+    println!("  zoriqa build --pages <folder> --out <folder>");
+    println!("  zoriqa dev <file.zq> --out <folder> --port <port>");
+    println!("  zoriqa dev --pages <folder> --out <folder> --port <port>");
+    println!("  zoriqa check <file.zq>");
+    println!("  zoriqa check --pages <folder>");
+    println!("  zoriqa tokens <file.zq>");
+    println!("  zoriqa ast <file.zq>");
 }
 
 fn match_dynamic_route(request_path: &str, out_dir: &str) -> Option<PathBuf> {

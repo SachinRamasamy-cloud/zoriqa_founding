@@ -1,7 +1,9 @@
 [package]
-name = "auig"
+name = "zoriqa"
 version = "0.1.0"
-edition = "2021"
-description = "AUIG v0.1 - a simple .aui to static website compiler"
-
+edition = "2024"
+description = "Zoriqa v0.1 - a simple .zq to static website compiler"
+license="MIT"
+repository="https://github.com/SachinRamasamy-cloud/zoriqa_founding"
 [dependencies]
+wasm-bindgen = "0.2"

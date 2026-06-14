@@ -1,6 +1,6 @@
 use super::args::{UiCall, parse_ui_call};
 use super::styles::resolve_design;
-use super::{reindent_block_lines, safe_aui_string};
+use super::{reindent_block_lines, safe_zq_string};
 
 pub fn expand_alert(call: &UiCall, indent: &str) -> Result<String, String> {
     let title = call.positional.first().map(|s| s.as_str())
@@ -47,10 +47,10 @@ pub fn expand_alert(call: &UiCall, indent: &str) -> Result<String, String> {
     output.push_str(&format!("{}  column gap-small:\n", indent));
 
     if !title.is_empty() {
-        output.push_str(&format!("{}    h2 \"{}\" bold small\n", indent, safe_aui_string(title)));
+        output.push_str(&format!("{}    h2 \"{}\" bold small\n", indent, safe_zq_string(title)));
     }
     if !message.is_empty() {
-        output.push_str(&format!("{}    p \"{}\" small text-inherit\n", indent, safe_aui_string(&message)));
+        output.push_str(&format!("{}    p \"{}\" small text-inherit\n", indent, safe_zq_string(&message)));
     }
 
     if !other_children.is_empty() {
@@ -91,7 +91,7 @@ pub fn expand_badge(call: &UiCall, indent: &str) -> Result<String, String> {
 
     let mut output = String::new();
     output.push_str(&format!("{}row bg-{} text-{} px-3 py-1 rounded-{} text-xs bold inline-block w-auto:\n", indent, bg, text_color, resolved.radius));
-    output.push_str(&format!("{}  p \"{}\" text-inherit\n", indent, safe_aui_string(text)));
+    output.push_str(&format!("{}  p \"{}\" text-inherit\n", indent, safe_zq_string(text)));
 
     Ok(output.trim_end().to_string())
 }

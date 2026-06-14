@@ -1,6 +1,6 @@
 use super::args::{UiCall, parse_ui_call};
 use super::styles::resolve_design;
-use super::{reindent_block_lines, safe_aui_string};
+use super::{reindent_block_lines, safe_zq_string};
 
 pub fn expand_hero(call: &UiCall, indent: &str) -> Result<String, String> {
     let title = call.positional.first().map(|s| s.as_str())
@@ -36,10 +36,10 @@ pub fn expand_hero(call: &UiCall, indent: &str) -> Result<String, String> {
     let mut output = String::new();
     output.push_str(&format!("{}section bg-{} text-{} py-20 px-8 rounded-2xl my-8:\n", indent, resolved.bg, resolved.text));
     output.push_str(&format!("{}  center:\n", indent));
-    output.push_str(&format!("{}    h1 \"{}\" bold large\n", indent, safe_aui_string(title)));
+    output.push_str(&format!("{}    h1 \"{}\" bold large\n", indent, safe_zq_string(title)));
 
     if !subtitle.is_empty() {
-        output.push_str(&format!("{}    p \"{}\" medium text-inherit opacity-90\n", indent, safe_aui_string(&subtitle)));
+        output.push_str(&format!("{}    p \"{}\" medium text-inherit opacity-90\n", indent, safe_zq_string(&subtitle)));
     }
 
     let has_btn = call.props.contains_key("btn-text");
@@ -49,7 +49,7 @@ pub fn expand_hero(call: &UiCall, indent: &str) -> Result<String, String> {
         if let Some(btn_text) = call.props.get("btn-text") {
             let btn_to = call.props.get("btn-to").map(|s| s.as_str()).unwrap_or("#");
             let btn_theme = call.props.get("btn-theme").map(|s| s.as_str()).unwrap_or("secondary");
-            output.push_str(&format!("{}      btn \"{}\" {} to \"{}\"\n", indent, safe_aui_string(btn_text), btn_theme, safe_aui_string(btn_to)));
+            output.push_str(&format!("{}      btn \"{}\" {} to \"{}\"\n", indent, safe_zq_string(btn_text), btn_theme, safe_zq_string(btn_to)));
         }
 
         for act in actions {
@@ -57,7 +57,7 @@ pub fn expand_hero(call: &UiCall, indent: &str) -> Result<String, String> {
                 let text = act_call.positional.first().map(|s| s.as_str()).unwrap_or("Action");
                 let to = act_call.props.get("to").map(|s| s.as_str()).unwrap_or("#");
                 let btn_theme = if tone == Some("primary") || tone.is_none() { "secondary" } else { "primary" };
-                output.push_str(&format!("{}      btn \"{}\" {} to \"{}\"\n", indent, safe_aui_string(text), btn_theme, safe_aui_string(to)));
+                output.push_str(&format!("{}      btn \"{}\" {} to \"{}\"\n", indent, safe_zq_string(text), btn_theme, safe_zq_string(to)));
             }
         }
 

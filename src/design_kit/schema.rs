@@ -20,7 +20,7 @@ pub fn design_kit_registry() -> Vec<ComponentSchema> {
             allowed_variants: true,
             allowed_children: &[],
             expected_syntax: "navbar \"BrandName\"",
-            example_syntax: "navbar \"AUIG\" dark",
+            example_syntax: "navbar \"Zoriqa\" dark",
         },
         ComponentSchema {
             name: "footer",
@@ -29,7 +29,7 @@ pub fn design_kit_registry() -> Vec<ComponentSchema> {
             allowed_variants: true,
             allowed_children: &[],
             expected_syntax: "footer \"Copyright Text\"",
-            example_syntax: "footer \"© 2026 AUIG\"",
+            example_syntax: "footer \"© 2026 Zoriqa\"",
         },
         ComponentSchema {
             name: "hero",
@@ -56,7 +56,7 @@ pub fn design_kit_registry() -> Vec<ComponentSchema> {
             allowed_variants: true,
             allowed_children: &["icon", "desc", "badge", "style"],
             expected_syntax: "feature-card \"Title\" \"Description\"",
-            example_syntax: "feature-card \"Fast\" \"AUIG compiles in milliseconds.\"",
+            example_syntax: "feature-card \"Fast\" \"Zoriqa compiles in milliseconds.\"",
         },
         ComponentSchema {
             name: "profile-card",
@@ -146,7 +146,7 @@ pub fn design_kit_registry() -> Vec<ComponentSchema> {
             allowed_variants: true,
             allowed_children: &[],
             expected_syntax: "testimonial \"Quote\" \"Author\"",
-            example_syntax: "testimonial \"AUIG is great!\" \"John Doe\"",
+            example_syntax: "testimonial \"Zoriqa is great!\" \"John Doe\"",
         },
         ComponentSchema {
             name: "gallery",
@@ -178,7 +178,7 @@ pub fn validate_component(node: &ComponentNode, file_name: &str) -> Result<(), S
 
     if node.args.len() < schema.required_positionals {
         return Err(format!(
-            "AUIG-E102\n\n{} requires {} values\n\nExpected:\n\n{}\n\nExample:\n\n{}\n\n(at {}:{})",
+            "ZQ-E102\n\n{} requires {} values\n\nExpected:\n\n{}\n\nExample:\n\n{}\n\n(at {}:{})",
             node.name,
             schema.required_positionals,
             schema.expected_syntax,
@@ -190,14 +190,14 @@ pub fn validate_component(node: &ComponentNode, file_name: &str) -> Result<(), S
 
     if !schema.allowed_tones && node.flags.tone.is_some() {
         return Err(format!(
-            "AUIG-E103\n\nTones not allowed on {}\n\n(at {}:{})",
+            "ZQ-E103\n\nTones not allowed on {}\n\n(at {}:{})",
             node.name, file_name, node.line
         ));
     }
 
     if !schema.allowed_variants && node.flags.variant.is_some() {
         return Err(format!(
-            "AUIG-E104\n\nVariants not allowed on {}\n\n(at {}:{})",
+            "ZQ-E104\n\nVariants not allowed on {}\n\n(at {}:{})",
             node.name, file_name, node.line
         ));
     }
@@ -209,7 +209,7 @@ pub fn validate_component(node: &ComponentNode, file_name: &str) -> Result<(), S
                 crate::ast::Node::Element(e) => {
                     if e.tag != "style" && !schema.allowed_children.contains(&e.tag.as_str()) {
                         return Err(format!(
-                            "AUIG-E105\n\nChild element '{}' is not allowed in {}\n\nAllowed children: {:?}\n\n(at {}:{})",
+                            "ZQ-E105\n\nChild element '{}' is not allowed in {}\n\nAllowed children: {:?}\n\n(at {}:{})",
                             e.tag, node.name, schema.allowed_children, file_name, e.line
                         ));
                     }
@@ -217,7 +217,7 @@ pub fn validate_component(node: &ComponentNode, file_name: &str) -> Result<(), S
                 crate::ast::Node::Component(c) => {
                     if !schema.allowed_children.contains(&c.name.as_str()) {
                         return Err(format!(
-                            "AUIG-E105\n\nChild component '{}' is not allowed in {}\n\nAllowed children: {:?}\n\n(at {}:{})",
+                            "ZQ-E105\n\nChild component '{}' is not allowed in {}\n\nAllowed children: {:?}\n\n(at {}:{})",
                             c.name, node.name, schema.allowed_children, file_name, c.line
                         ));
                     }
@@ -232,7 +232,7 @@ pub fn validate_component(node: &ComponentNode, file_name: &str) -> Result<(), S
         if !crate::generator::is_valid_utility(flag) {
             let suggestion = crate::generator::find_closest_utility(flag);
             return Err(format!(
-                "AUIG-E106\n\nUnknown flag \"{}\" on component \"{}\"\n\nDid you mean:\n\"{}\"\n\n(at {}:{})",
+                "ZQ-E106\n\nUnknown flag \"{}\" on component \"{}\"\n\nDid you mean:\n\"{}\"\n\n(at {}:{})",
                 flag, node.name, suggestion, file_name, node.line
             ));
         }

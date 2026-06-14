@@ -27,10 +27,10 @@ pub fn generate_spa_index(app_title: &str) -> String {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{}</title>
-    <link rel="stylesheet" href="/auig.css" />
+    <link rel="stylesheet" href="/zoriqa.css" />
   </head>
   <body>
-    <div id="auig-root"></div>
+    <div id="zoriqa-root"></div>
     <script src="/app.js"></script>
   </body>
 </html>"#,
@@ -42,7 +42,7 @@ pub fn generate_spa_runtime(routes: &[RouteRecord]) -> String {
     let mut routes_json = String::new();
     routes_json.push_str("[\n");
     for r in routes {
-        let title_escaped = escape_js_string(r.title.as_deref().unwrap_or("AUIG App"));
+        let title_escaped = escape_js_string(r.title.as_deref().unwrap_or("Zoriqa App"));
         let html_escaped = escape_js_string(&r.html_fragment);
         routes_json.push_str(&format!(
             "  {{\n    path: \"{}\",\n    title: \"{}\",\n    html: \"{}\"\n  }},\n",
@@ -52,8 +52,8 @@ pub fn generate_spa_runtime(routes: &[RouteRecord]) -> String {
     routes_json.push_str("]");
 
     format!(
-        r##"// AUIG SPA Router Runtime
-window.__AUIG_ROUTES__ = {};
+        r##"// Zoriqa SPA Router Runtime
+window.__ZORIQA_ROUTES__ = {};
 
 function matchPath(pattern, pathname) {{
   const patternSegments = pattern.split('/').filter(Boolean);
@@ -83,7 +83,7 @@ function matchPath(pattern, pathname) {{
 }}
 
 function matchRoute(pathname) {{
-  for (const route of window.__AUIG_ROUTES__) {{
+  for (const route of window.__ZORIQA_ROUTES__) {{
     const match = matchPath(route.path, pathname);
     if (match) {{
       return {{
@@ -96,15 +96,15 @@ function matchRoute(pathname) {{
 }}
 
 function renderNotFound() {{
-  const route404 = window.__AUIG_ROUTES__.find(r => r.path === "/404");
+  const route404 = window.__ZORIQA_ROUTES__.find(r => r.path === "/404");
   if (route404) {{
-    document.getElementById("auig-root").innerHTML = route404.html;
+    document.getElementById("zoriqa-root").innerHTML = route404.html;
     document.title = route404.title || "404 Not Found";
   }} else {{
-    document.getElementById("auig-root").innerHTML = `
-      <main class="aui-center">
-        <h1 class="aui-heading aui-h1 aui-bold aui-large">404</h1>
-        <p class="aui-text">Page not found</p>
+    document.getElementById("zoriqa-root").innerHTML = `
+      <main class="zq-center">
+        <h1 class="zq-heading zq-h1 zq-bold zq-large">404</h1>
+        <p class="zq-text">Page not found</p>
       </main>
     `;
     document.title = "404 Not Found";
@@ -119,8 +119,8 @@ function navigate(path) {{
     return;
   }}
 
-  document.getElementById("auig-root").innerHTML = route.html;
-  document.title = route.title || "AUIG App";
+  document.getElementById("zoriqa-root").innerHTML = route.html;
+  document.title = route.title || "Zoriqa App";
 }}
 
 document.addEventListener("click", function (event) {{
@@ -128,7 +128,7 @@ document.addEventListener("click", function (event) {{
   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   if (event.button !== 0) return;
 
-  const link = event.target.closest("a[data-auig-link]");
+  const link = event.target.closest("a[data-zoriqa-link]");
   if (!link) return;
 
   const target = link.getAttribute("target");

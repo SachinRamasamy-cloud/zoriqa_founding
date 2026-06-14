@@ -316,7 +316,7 @@ impl Parser {
                         }
                     }
                     return Err(format!(
-                        "AUIG Error: Unknown style property \"{}\".\n\nDid you mean:\n\"{}\"?\n\n(at line {})",
+                        "Zoriqa Error: Unknown style property \"{}\".\n\nDid you mean:\n\"{}\"?\n\n(at line {})",
                         key, closest, self.peek().line
                     ));
                 }
@@ -551,7 +551,7 @@ fn levenshtein_distance(s1: &str, s2: &str) -> usize {
     fn error<T>(&self, message: &str) -> Result<T, String> {
         let token = self.peek();
         Err(format!(
-            "AUIG Error: {} at line {}, column {}",
+            "Zoriqa Error: {} at line {}, column {}",
             message, token.line, token.column
         ))
     }

@@ -1,7 +1,7 @@
-import "components/layout.aui"
+import "components/layout.zq"
 
 page Docs layout Main:
-  title "AUIG Design Kit Documentation"
+  title "Zoriqa Design Kit Documentation"
 
   view:
     hero "Design Kit Component Guide" primary:

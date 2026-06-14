@@ -9,12 +9,12 @@ pub fn apply_layouts(program: &mut Program, file_name: &str) -> Result<(), Strin
             let slot_count = count_slots(&layout.children);
             if slot_count == 0 {
                 return Err(format!(
-                    "AUIG Error: layout \"{}\" must include one slot. (at {}:{})",
+                    "Zoriqa Error: layout \"{}\" must include one slot. (at {}:{})",
                     layout.name, file_name, layout.line
                 ));
             } else if slot_count > 1 {
                 return Err(format!(
-                    "AUIG Error: layout \"{}\" cannot contain multiple slots. (at {}:{})",
+                    "Zoriqa Error: layout \"{}\" cannot contain multiple slots. (at {}:{})",
                     layout.name, file_name, layout.line
                 ));
             }
@@ -28,7 +28,7 @@ pub fn apply_layouts(program: &mut Program, file_name: &str) -> Result<(), Strin
             if let Some(ref layout_name) = page.layout {
                 let layout = layouts.get(layout_name).ok_or_else(|| {
                     format!(
-                        "AUIG Error: layout '{}' was not found (for page '{}' at {}:{})",
+                        "Zoriqa Error: layout '{}' was not found (for page '{}' at {}:{})",
                         layout_name, page.name, file_name, page.line
                     )
                 })?;

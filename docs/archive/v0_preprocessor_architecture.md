@@ -1,27 +1,27 @@
-# AUIG Design Kit Compiler Architecture Documentation
+# Zoriqa Design Kit Compiler Architecture Documentation
 
 > [!WARNING]
-> **Deprecated**: This document describes the old preprocessor-based AUIG architecture. The current compiler uses an AST-driven architecture. Refer to the [master_documentation.md](file:///home/sachin/auig%20my%20project/auig_v0_1/docs/master_documentation.md) for the source of truth.
+> **Deprecated**: This document describes the old preprocessor-based Zoriqa architecture. The current compiler uses an AST-driven architecture. Refer to the [master_documentation.md](file:///home/sachin/auig%20my%20project/auig_v0_1/docs/master_documentation.md) for the source of truth.
 
-This documentation describes how the AUIG Design Kit is stored, structured, parsed, and compiled end-to-end within the compiler backend.
+This documentation describes how the Zoriqa Design Kit is stored, structured, parsed, and compiled end-to-end within the compiler backend.
 
 ---
 
 ## 1. Overview & Compiler Pipeline
 
-The AUIG Design Kit allows users to write pre-designed components like `navbar`, `footer`, `hero`, `alert`, and various `cards` using high-level syntax.
+The Zoriqa Design Kit allows users to write pre-designed components like `navbar`, `footer`, `hero`, `alert`, and various `cards` using high-level syntax.
 
 The compiler processes these components in a **three-step pipeline**:
 
 ```mermaid
 graph TD
-    A[".aui Page Source"] --> B["1. Preprocessor (src/preprocessor.rs)"]
+    A[".zq Page Source"] --> B["1. Preprocessor (src/preprocessor.rs)"]
     B -->|Resolves Component Calls| C["Design Kit Modules (src/design_kit/*)"]
     C -->|Expands to AUI Primitives| D["Preprocessed AUI Source"]
     D --> E["2. Parser & AST Generation (src/main.rs / generator.rs)"]
     E -->|Generates HTML| F["dist/index.html"]
     E -->|JIT Collects Flags| G["3. JIT CSS Compiler (src/generator.rs)"]
-    G -->|Generates Stylesheet| H["dist/auig.css"]
+    G -->|Generates Stylesheet| H["dist/zoriqa.css"]
 ```
 
 ---
@@ -74,7 +74,7 @@ pub struct StyleOverrides {
 - **Function**: `parse_ui_call(header_line: &str, block_lines: &[String]) -> Result<UiCall, String>`
 - **Behavior**:
   - Tokens are parsed using whitespace/quote boundaries.
-  - String literals (e.g., `"AUIG"`) are collected as positional args.
+  - String literals (e.g., `"Zoriqa"`) are collected as positional args.
   - Bare keywords followed by string literals (e.g., `to "/pricing"`) are mapped to property key-value pairs.
   - Bare keywords on their own (e.g., `dark`) are registered as flags.
   - A nested block named `style:` is intercepted to populate the `StyleOverrides` struct. All other nested lines are collected as general component `children`.
@@ -131,7 +131,7 @@ Here is the exact mapping of all 8 built-in UI components.
     section py-12 px-8:
       (nested children)
       row justify-between items-center border-t border-gray-800 pt-8 mt-8:
-        p "© 2026 AUIG Project" muted small
+        p "© 2026 Zoriqa Project" muted small
   ```
 
 ### 3. Hero Section (`hero`)
@@ -176,16 +176,16 @@ Here is the exact mapping of all 8 built-in UI components.
 
 Here is a step-by-step example showing how a page footer is processed.
 
-### 1. Input code in `pages/index.aui`
+### 1. Input code in `pages/index.zq`
 ```aui
-import "auig/ui"
+import "zoriqa/ui"
 
 page Home:
   view:
-    footer "© 2026 AUIG Project." dark:
+    footer "© 2026 Zoriqa Project." dark:
       row gap-large:
         column:
-          h2 "AUIG" bold text-white
+          h2 "Zoriqa" bold text-white
 ```
 
 ### 2. Preprocessor Interception
@@ -193,13 +193,13 @@ In `src/preprocessor.rs`, the line starting with `footer ` is matched. The block
 ```text
       row gap-large:
         column:
-          h2 "AUIG" bold text-white
+          h2 "Zoriqa" bold text-white
 ```
 `parse_ui_call` is called, returning a `UiCall` struct containing:
 - `name`: `"footer"`
-- `positional`: `["© 2026 AUIG Project."]`
+- `positional`: `["© 2026 Zoriqa Project."]`
 - `flags`: `["dark"]`
-- `children`: `["      row gap-large:", "        column:", "          h2 \"AUIG\" bold text-white"]`
+- `children`: `["      row gap-large:", "        column:", "          h2 \"Zoriqa\" bold text-white"]`
 
 ### 3. Macro Expansion
 `expand_footer` is called and returns the expanded AUI code:
@@ -208,34 +208,34 @@ In `src/preprocessor.rs`, the line starting with `footer ` is matched. The block
       section py-12 px-8:
         row gap-large:
           column:
-            h2 "AUIG" bold text-white
+            h2 "Zoriqa" bold text-white
         row justify-between items-center border-t border-gray-800 pt-8 mt-8:
-          p "© 2026 AUIG Project." muted small
+          p "© 2026 Zoriqa Project." muted small
 ```
 
 ### 4. HTML Class Generation
-The compiler parses the expanded AUI structure and translates it to HTML elements. Each class name gets prefixed with `aui-`:
+The compiler parses the expanded AUI structure and translates it to HTML elements. Each class name gets prefixed with `zq-`:
 ```html
-<div class="aui-box aui-bg-gray-950 aui-text-white aui-border-t aui-border-gray-800 aui-w-full">
-  <div class="aui-section aui-py-12 aui-px-8">
-    <div class="aui-row aui-gap-large">
-      <div class="aui-column">
-        <h2 class="aui-heading aui-h2 aui-bold aui-text-white">AUIG</h2>
+<div class="zq-box zq-bg-gray-950 zq-text-white zq-border-t zq-border-gray-800 zq-w-full">
+  <div class="zq-section zq-py-12 zq-px-8">
+    <div class="zq-row zq-gap-large">
+      <div class="zq-column">
+        <h2 class="zq-heading zq-h2 zq-bold zq-text-white">Zoriqa</h2>
       </div>
     </div>
-    <div class="aui-row aui-justify-between aui-items-center aui-border-t aui-border-gray-800 aui-pt-8 aui-mt-8">
-      <p class="aui-text aui-muted aui-small">© 2026 AUIG Project.</p>
+    <div class="zq-row zq-justify-between zq-items-center zq-border-t zq-border-gray-800 zq-pt-8 zq-mt-8">
+      <p class="zq-text zq-muted zq-small">© 2026 Zoriqa Project.</p>
     </div>
   </div>
 </div>
 ```
 
 ### 5. JIT CSS Generation
-The flags/classes generated in the HTML (like `bg-gray-950`, `w-full`, `py-12`, `border-t`) are collected into a set. The CSS generator in `src/generator.rs` matches them and compiles the minimized `dist/auig.css`:
+The flags/classes generated in the HTML (like `bg-gray-950`, `w-full`, `py-12`, `border-t`) are collected into a set. The CSS generator in `src/generator.rs` matches them and compiles the minimized `dist/zoriqa.css`:
 ```css
-.aui-bg-gray-950 { background-color: #030712; }
-.aui-w-full { width: 100%; }
-.aui-py-12 { padding-top: 48px; padding-bottom: 48px; }
-.aui-border-t { border-top-style: solid; border-top-width: 1px; }
+.zq-bg-gray-950 { background-color: #030712; }
+.zq-w-full { width: 100%; }
+.zq-py-12 { padding-top: 48px; padding-bottom: 48px; }
+.zq-border-t { border-top-style: solid; border-top-width: 1px; }
 ```
 This output is written directly to the target output CSS file.

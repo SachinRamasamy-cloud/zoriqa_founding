@@ -1,17 +1,17 @@
 {
-  "name": "auig_v0_1",
+  "name": "zoriqa",
   "version": "1.0.0",
-  "description": "AUIG is a tiny Rust-built website language compiler.",
+  "description": "Zoriqa is a tiny Rust-built website language compiler.",
   "main": "index.js",
   "directories": {
     "example": "examples"
   },
   "scripts": {
-    "aui": "cargo run -- dev --pages pages --out dist --port 3001",
-    "aui:build": "cargo run -- build --pages pages --out dist",
-    "aui:check": "cargo run -- check --pages pages",
-    "aui:single": "cargo run -- dev app.aui --out dist --port 3001"
-  },
+  "zq": "cargo run -- dev --pages pages --out dist --port 3000",
+  "zq:build": "cargo run -- build --pages pages --out dist",
+  "zq:spa": "cargo run -- build --pages pages --out dist --mode spa",
+  "zq:check": "cargo run -- check app.zq"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

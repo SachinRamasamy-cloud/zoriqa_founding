@@ -1,11 +1,11 @@
-import "components/layout.aui"
+import "components/layout.zq"
 
 page Showcase layout Main:
-  title "AUIG - Showcase"
+  title "Zoriqa - Showcase"
 
   view:
     hero "Web Layout Showcase" primary:
-      subtitle "Explore standard static website layouts and designs crafted entirely in AUIG."
+      subtitle "Explore standard static website layouts and designs crafted entirely in Zoriqa."
       action "Browse Templates" to "#templates"
       badge "Showcase Gallery" warning
 

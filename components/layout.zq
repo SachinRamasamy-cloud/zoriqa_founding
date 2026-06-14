@@ -1,7 +1,7 @@
-import "auig/ui"
+import "zoriqa/ui"
 
 layout Main:
-  navbar "AUIG" dark:
+  navbar "Zoriqa" dark:
     link "Docs" to "/docs"
     link "About" to "/about"
     link "Dashboard" to "/dashboard"
@@ -10,4 +10,4 @@ layout Main:
 
   slot
 
-  footer "© 2026 AUIG Project. Open source software."
+  footer "© 2026 Zoriqa Project. Open source software."

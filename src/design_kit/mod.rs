@@ -25,7 +25,7 @@ pub fn transform_nodes(
                         if !crate::generator::is_valid_utility(flag) {
                             let suggestion = crate::generator::find_closest_utility(flag);
                             return Err(format!(
-                                "AUIG-E106\n\nUnknown flag \"{}\" on element \"{}\"\n\nDid you mean:\n\"{}\"\n\n(at {}:{})",
+                                "ZQ-E106\n\nUnknown flag \"{}\" on element \"{}\"\n\nDid you mean:\n\"{}\"\n\n(at {}:{})",
                                 flag, elem.tag, suggestion, file_name, elem.line
                             ));
                         }
@@ -41,30 +41,30 @@ pub fn transform_nodes(
                 // 2. Check if built-in design kit component
                 if is_builtin_kit(&comp.name) {
                     let required_kit = match comp.name.as_str() {
-                        "navbar" => "auig/navbar",
-                        "footer" => "auig/footer",
-                        "hero" => "auig/hero",
-                        "stat-card" | "feature-card" | "profile-card" | "pricing-card" | "dashboard-card" => "auig/card",
-                        "alert" => "auig/alert",
-                        "badge" => "auig/badge",
-                        _ => "auig/ui",
+                        "navbar" => "zoriqa/navbar",
+                        "footer" => "zoriqa/footer",
+                        "hero" => "zoriqa/hero",
+                        "stat-card" | "feature-card" | "profile-card" | "pricing-card" | "dashboard-card" => "zoriqa/card",
+                        "alert" => "zoriqa/alert",
+                        "badge" => "zoriqa/badge",
+                        _ => "zoriqa/ui",
                     };
 
                     let has_kit = active_kits.iter().any(|kit| {
                         kit == required_kit || 
-                        (required_kit == "auig/card" && kit == "auig/cards") ||
-                        (required_kit == "auig/navbar" && kit == "auig/nav") ||
-                        (required_kit == "auig/alert" && kit == "auig/feedback") ||
-                        (required_kit == "auig/badge" && kit == "auig/feedback") ||
-                        kit == "auig/ui" || 
-                        kit == "auig/kit" || 
-                        kit == "auig/all" || 
-                        kit == "auig/components"
+                        (required_kit == "zoriqa/card" && kit == "zoriqa/cards") ||
+                        (required_kit == "zoriqa/navbar" && kit == "zoriqa/nav") ||
+                        (required_kit == "zoriqa/alert" && kit == "zoriqa/feedback") ||
+                        (required_kit == "zoriqa/badge" && kit == "zoriqa/feedback") ||
+                        kit == "zoriqa/ui" || 
+                        kit == "zoriqa/kit" || 
+                        kit == "zoriqa/all" || 
+                        kit == "zoriqa/components"
                     });
 
                     if !has_kit {
                         return Err(format!(
-                            "AUIG Error: '{}' requires import \"{}\" (at {}:{})",
+                            "Zoriqa Error: '{}' requires import \"{}\" (at {}:{})",
                             comp.name, required_kit, file_name, comp.line
                         ));
                     }
@@ -78,7 +78,7 @@ pub fn transform_nodes(
                     transformed.extend(recursively_transformed);
                 } else {
                     return Err(format!(
-                        "AUIG Error: component '{}' was not found (at {}:{})",
+                        "Zoriqa Error: component '{}' was not found (at {}:{})",
                         comp.name, file_name, comp.line
                     ));
                 }
@@ -128,7 +128,7 @@ fn expand_builtin_component(
 
     match comp.name.as_str() {
         "navbar" => {
-            let brand = comp.args.first().map(|v| v.as_str()).unwrap_or("AUIG");
+            let brand = comp.args.first().map(|v| v.as_str()).unwrap_or("Zoriqa");
             let resolved = resolve_design_v1(tone, variant, ("gray-950", "white", "gray-800", "", "none"), &comp.style, &comp.props);
             
             let mut classes = vec![
@@ -167,7 +167,7 @@ fn expand_builtin_component(
             }))
         }
         "footer" => {
-            let copy = comp.args.first().map(|v| v.as_str()).unwrap_or("© AUIG");
+            let copy = comp.args.first().map(|v| v.as_str()).unwrap_or("© Zoriqa");
             let resolved = resolve_design_v1(tone, variant, ("gray-950", "white", "gray-800", "", "none"), &comp.style, &comp.props);
             
             let classes = vec![
@@ -733,7 +733,7 @@ fn expand_builtin_component(
             }))
         }
         _ => Err(format!(
-            "AUIG Error: transform for built-in '{}' is not implemented",
+            "Zoriqa Error: transform for built-in '{}' is not implemented",
             comp.name
         )),
     }
@@ -746,7 +746,7 @@ fn expand_user_component(
     // Check parameters match
     if comp.args.len() < decl.params.len() {
         return Err(format!(
-            "AUIG Error: component '{}' expects {} arguments, but got {} (at line {})",
+            "Zoriqa Error: component '{}' expects {} arguments, but got {} (at line {})",
             comp.name,
             decl.params.len(),
             comp.args.len(),

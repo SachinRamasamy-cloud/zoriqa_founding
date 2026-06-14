@@ -1,7 +1,7 @@
-import "components/layout.aui"
+import "components/layout.zq"
 
 page Home layout Main:
-  title "AUIG - Modern Indented Web Language"
+  title "Zoriqa - Modern Indented Web Language"
 
   view:
     alert "Release Alert" success

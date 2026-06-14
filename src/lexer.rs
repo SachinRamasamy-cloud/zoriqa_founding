@@ -44,7 +44,7 @@ pub fn lex(source: &str) -> Result<Vec<Token>, String> {
                 if line_ended_with_colon {
                     if indent <= current_indent {
                         return Err(format!(
-                            "AUIG Error: expected indented block after ':' at line {}, column {}",
+                            "Zoriqa Error: expected indented block after ':' at line {}, column {}",
                             line, column
                         ));
                     }
@@ -59,13 +59,13 @@ pub fn lex(source: &str) -> Result<Vec<Token>, String> {
 
                     if indent != *indent_stack.last().unwrap() && indent_stack.len() > 1 {
                         return Err(format!(
-                            "AUIG Error: indentation does not match any previous block at line {}, column {}",
+                            "Zoriqa Error: indentation does not match any previous block at line {}, column {}",
                             line, column
                         ));
                     }
                 } else if indent > current_indent && indent_stack.len() > 1 {
                     return Err(format!(
-                        "AUIG Error: unexpected indentation at line {}, column {}",
+                        "Zoriqa Error: unexpected indentation at line {}, column {}",
                         line, column
                     ));
                 }
@@ -120,7 +120,7 @@ pub fn lex(source: &str) -> Result<Vec<Token>, String> {
                 while i < chars.len() && chars[i] != '"' {
                     if chars[i] == '\n' {
                         return Err(format!(
-                            "AUIG Error: string was not closed at line {}, column {}",
+                            "Zoriqa Error: string was not closed at line {}, column {}",
                             line, start_column
                         ));
                     }
@@ -132,7 +132,7 @@ pub fn lex(source: &str) -> Result<Vec<Token>, String> {
 
                 if i >= chars.len() {
                     return Err(format!(
-                        "AUIG Error: string was not closed at line {}, column {}",
+                        "Zoriqa Error: string was not closed at line {}, column {}",
                         line, start_column
                     ));
                 }
@@ -158,7 +158,7 @@ pub fn lex(source: &str) -> Result<Vec<Token>, String> {
 
             _ => {
                 return Err(format!(
-                    "AUIG Error: unexpected character '{}' at line {}, column {}",
+                    "Zoriqa Error: unexpected character '{}' at line {}, column {}",
                     ch, line, column
                 ));
             }

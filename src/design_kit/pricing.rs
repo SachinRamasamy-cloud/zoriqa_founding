@@ -1,15 +1,15 @@
 use super::args::{UiCall, parse_ui_call};
 use super::styles::resolve_design;
-use super::{reindent_block_lines, safe_aui_string};
+use super::{reindent_block_lines, safe_zq_string};
 
 pub fn expand_pricing_card(call: &UiCall, indent: &str) -> Result<String, String> {
     let title = call.positional.first().map(|s| s.as_str())
         .or_else(|| call.props.get("title").map(|s| s.as_str()))
-        .ok_or_else(|| "AUIG Error: pricing-card requires title".to_string())?;
+        .ok_or_else(|| "Zoriqa Error: pricing-card requires title".to_string())?;
 
     let price = call.positional.get(1).map(|s| s.as_str())
         .or_else(|| call.props.get("price").map(|s| s.as_str()))
-        .ok_or_else(|| "AUIG Error: pricing-card requires price".to_string())?;
+        .ok_or_else(|| "Zoriqa Error: pricing-card requires price".to_string())?;
 
     let mut desc = call.props.get("desc").map(|s| s.to_string()).unwrap_or_default();
     let mut actions = Vec::new();
@@ -73,13 +73,13 @@ pub fn expand_pricing_card(call: &UiCall, indent: &str) -> Result<String, String
     }
 
     output.push_str(&format!("{}    column gap-small:\n", indent));
-    output.push_str(&format!("{}      h2 \"{}\" bold\n", indent, safe_aui_string(title)));
+    output.push_str(&format!("{}      h2 \"{}\" bold\n", indent, safe_zq_string(title)));
     if !desc.is_empty() {
         let text_muted = if tone == Some("dark") { "opacity-80" } else { "muted" };
-        output.push_str(&format!("{}      p \"{}\" {} small\n", indent, safe_aui_string(&desc), text_muted));
+        output.push_str(&format!("{}      p \"{}\" {} small\n", indent, safe_zq_string(&desc), text_muted));
     }
 
-    output.push_str(&format!("{}    h1 \"{}\" bold large\n", indent, safe_aui_string(price)));
+    output.push_str(&format!("{}    h1 \"{}\" bold large\n", indent, safe_zq_string(price)));
 
     if !items.is_empty() || !other_children.is_empty() {
         output.push_str(&format!("{}    column gap-small:\n", indent));
@@ -87,7 +87,7 @@ pub fn expand_pricing_card(call: &UiCall, indent: &str) -> Result<String, String
             // Render checkmark list item
             output.push_str(&format!("{}      row gap-small items-center:\n", indent));
             output.push_str(&format!("{}        p \"✓\" text-blue-600 bold\n", indent));
-            output.push_str(&format!("{}        p \"{}\" text-inherit\n", indent, safe_aui_string(&item)));
+            output.push_str(&format!("{}        p \"{}\" text-inherit\n", indent, safe_zq_string(&item)));
         }
         if !other_children.is_empty() {
             let reindented = reindent_block_lines(&other_children, &format!("{}      ", indent));
@@ -103,13 +103,13 @@ pub fn expand_pricing_card(call: &UiCall, indent: &str) -> Result<String, String
                 let text = act_call.positional.first().map(|s| s.as_str()).unwrap_or("Select");
                 let to = act_call.props.get("to").map(|s| s.as_str()).unwrap_or("#");
                 let btn_theme = if popular { "primary" } else { "secondary" };
-                output.push_str(&format!("{}    btn \"{}\" {} to \"{}\"\n", indent, safe_aui_string(text), btn_theme, safe_aui_string(to)));
+                output.push_str(&format!("{}    btn \"{}\" {} to \"{}\"\n", indent, safe_zq_string(text), btn_theme, safe_zq_string(to)));
             }
         }
     } else if let Some(btn_text) = call.props.get("button-text") {
         let btn_to = call.props.get("button-to").map(|s| s.as_str()).unwrap_or("#");
         let btn_theme = if popular { "primary" } else { "secondary" };
-        output.push_str(&format!("{}    btn \"{}\" {} to \"{}\"\n", indent, safe_aui_string(btn_text), btn_theme, safe_aui_string(btn_to)));
+        output.push_str(&format!("{}    btn \"{}\" {} to \"{}\"\n", indent, safe_zq_string(btn_text), btn_theme, safe_zq_string(btn_to)));
     }
 
     Ok(output.trim_end().to_string())
