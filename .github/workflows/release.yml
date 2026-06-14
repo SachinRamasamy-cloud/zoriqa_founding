@@ -5,6 +5,10 @@ on:
     tags:
       - "v*"
 
+# Add this block right here:
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
